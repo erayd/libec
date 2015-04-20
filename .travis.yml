@@ -1,0 +1,48 @@
+language: c
+
+os: linux
+
+compiler: gcc
+
+before_install:
+  - git clone https://github.com/jedisct1/libsodium.git
+  - cd libsodium
+  - git checkout 1.0.2
+  - ./autogen.sh
+  - ./configure && make check
+  - sudo make install
+  - sudo ldconfig
+  - cd ..
+
+before_script:
+  - ./autogen.sh
+
+script:
+  - ./configure
+  - make
+  - sudo make install
+  - sudo ldconfig
+
+notifications:
+  irc:
+    channels: chat.freenode.net#libec
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: true
+
+env:
+  global:
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "q7ZGv9+Wev7WGEkiasNF7nMycZSKfaoeGsYO0vQZ++AaOwKVe2QqI0uj0UjABcMO64ayLXJACmTCi9EZNFebnU04drPsDOwAT+fkXOUwsX9hnpshDi32x9MazwZ2KztbxiWXv9i7Um/CEuw7oZkEX5lnC9AwHq4u3GJUzOEV5Eo="
+
+addons:
+  coverity_scan:
+    project:
+      name: "erayd/libec"
+      description: "A small PKI library"
+    notification_email: steve@erayd.net
+    build_command_prepend: "git clone https://github.com/jedisct1/libsodium.git; cd libsodium; git checkout 1.0.2; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig; cd ..; ./autogen.sh; ./configure"
+    build_command: "make -j4"
+    branch_pattern: coverity_scan
