@@ -142,6 +142,7 @@ ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, unsigne
 
 //free a record, plus associated data if KFREE / DFREE is set
 void ec_record_destroy(ec_record_t *r);
+
 //create a new certificate
 ec_cert_t *ec_cert(void);
 
