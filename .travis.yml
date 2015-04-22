@@ -45,4 +45,4 @@ addons:
     notification_email: steve@erayd.net
     build_command_prepend: "git clone https://github.com/jedisct1/libsodium.git; cd libsodium; git checkout 1.0.2; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig; cd ..; ./autogen.sh; ./configure"
     build_command: "make -j4"
-    branch_pattern: coverity_scan
+    branch_pattern: coverity
