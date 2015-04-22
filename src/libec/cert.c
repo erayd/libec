@@ -38,6 +38,17 @@ ec_cert_t *ec_cert(void) {
 }
 
 /**
+ * Get the unique ID for a certificate and store into 'id'
+ */
+void ec_cert_id(ec_id_t id, ec_cert_t *c) {
+  //type is currently always ed25519, so just get the pk and use that
+  assert(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
+  ec_record_t *pk = ec_match(c->records, "_cert", 0, (unsigned char*)"key", 0, NULL, crypto_sign_PUBLICKEYBYTES);
+  assert(pk, EC_EINVALID, NULL);
+  memcpy(id, pk->data, pk->data_len);
+}
+
+/**
  * Sign a certificate
  */
 ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t valid_until) {

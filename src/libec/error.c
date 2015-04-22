@@ -48,6 +48,7 @@ char *ec_errstr(ec_err_t errno) {
     case EC_ENOTFOUND: return "Search returned no results";
     case EC_EGRANT: return "Role not granted";
     case EC_EIMPORT: return "Import error";
+    case EC_EINVALID: return "Invalid data";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

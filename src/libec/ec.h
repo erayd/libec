@@ -49,6 +49,7 @@ char *ec_errstr(ec_err_t errno);
 #define EC_ENOTFOUND 25 /*search returned no results*/
 #define EC_EGRANT 26 /*role not granted*/
 #define EC_EIMPORT 27 /*import error*/
+#define EC_EINVALID 28 /*invalid data*/
 
 //certificate flags
 #define EC_CERT_TRUSTED (1 << 8) /*<not exported> certificate is considered a trusted root*/
@@ -118,6 +119,9 @@ typedef struct ec_record_t {
   uint8_t key_len;
 } ec_record_t;
 
+//id type
+typedef unsigned char ec_id_t[32];
+
 //create a new record - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
 ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len);
 
@@ -133,6 +137,9 @@ void ec_record_destroy(ec_record_t *r);
 
 //create a new certificate
 ec_cert_t *ec_cert(void);
+
+//get the unique ID for a certificate and store into 'id'
+void ec_cert_id(ec_id_t id, ec_cert_t *c);
 
 //sign a certificate and set the validity period
 ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t valid_until);
