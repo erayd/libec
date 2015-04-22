@@ -20,6 +20,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Save a certificate in the local store
  */
 ec_err_t ec_store_save(ec_ctx_t *ctx, ec_cert_t *c) {
+  assert(ctx->save, EC_EUNDEFINED, NULL);
   return ctx->save(c);
 }
 
@@ -27,6 +28,7 @@ ec_err_t ec_store_save(ec_ctx_t *ctx, ec_cert_t *c) {
  * Load a certificate from the local store
  */
 ec_cert_t *ec_store_load(ec_ctx_t *ctx, ec_id_t id) {
+  assert(ctx->load, EC_EUNDEFINED, NULL);
   return ctx->load(id);
 }
 
@@ -34,5 +36,6 @@ ec_cert_t *ec_store_load(ec_ctx_t *ctx, ec_id_t id) {
  * Remove a certificate from the local store
  */
 ec_err_t ec_store_remove(ec_ctx_t *ctx, ec_id_t id) {
+  assert(ctx->remove, EC_EUNDEFINED, NULL);
   return ctx->remove(id);
 }
