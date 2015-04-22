@@ -123,20 +123,16 @@ typedef struct ec_record_t {
 typedef unsigned char ec_id_t[32];
 
 //context type
-typedef struct ec_ctx_t {
-  ec_err_t (*save)(ec_cert_t *c);
-  ec_cert_t *(*load)(ec_id_t id);
-  ec_err_t (*remove)(ec_id_t id);
-} ec_ctx_t;
+typedef struct ec_ctx_t *ec_ctx_t;
 
 //save a certificate in the local store
-ec_err_t ec_store_save(ec_ctx_t *ctx, ec_cert_t *c);
+ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c);
 
 //load a certificate from the local store
-ec_cert_t *ec_store_load(ec_ctx_t *ctx, ec_id_t id);
+ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id);
 
 //remove a certificate from the local store
-ec_err_t ec_store_remove(ec_ctx_t *ctx, ec_id_t id);
+ec_err_t ec_store_remove(ec_ctx_t ctx, ec_id_t id);
 
 //create a new record - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
 ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len);
