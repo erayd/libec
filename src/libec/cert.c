@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 ec_cert_t *ec_cert(void) {
   ec_cert_t *c = calloc(1, sizeof(*c));
+  assert(c, EC_ENOMEM, NULL);
   c->version = EC_CERT_VERSION;
   unsigned char pk[crypto_sign_PUBLICKEYBYTES];
   unsigned char sk[crypto_sign_SECRETKEYBYTES];
