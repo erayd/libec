@@ -30,6 +30,7 @@ libec_la_SOURCES = common.h \
                       ec.h \
                       libec.c \
                       cert.c \
+                      context.c \
                       error.c \
                       export.c \
                       record.c \
