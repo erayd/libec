@@ -15,6 +15,21 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <common.h>
+#include <malloc.h>
+
+/**
+ * Initialise a new context
+ */
+void ec_ctx_init(ec_ctx_t *ctx) {
+  assert(*ctx = calloc(1, sizeof(**ctx)), EC_ENOMEM, NULL);
+}
+
+/**
+ * Destroy a context
+ */
+void ec_ctx_destroy(ec_ctx_t *ctx) {
+  free(*ctx);
+}
 
 /**
  * Save a certificate in the local store

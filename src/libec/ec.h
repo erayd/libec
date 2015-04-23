@@ -125,6 +125,12 @@ typedef unsigned char ec_id_t[32];
 //context type
 typedef struct ec_ctx_t *ec_ctx_t;
 
+//initialise a new context
+void ec_ctx_init(ec_ctx_t *ctx);
+
+//destroy a context
+void ec_ctx_destroy(ec_ctx_t *ctx);
+
 //save a certificate in the local store
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c);
 
