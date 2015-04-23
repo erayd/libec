@@ -241,7 +241,7 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
 /**
  * Tests whether two certificates are equal, based on their signable properties
  */
-int ec_certcmp(ec_cert_t *c1, ec_cert_t *c2) {
+ec_err_t ec_certcmp(ec_cert_t *c1, ec_cert_t *c2) {
   if(c1 == c2)
     return EC_ESELF;
   unsigned char h1[EC_METHOD_BLAKE2B_512_BYTES];

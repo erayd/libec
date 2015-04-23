@@ -165,8 +165,8 @@ ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t 
 //check that a certificate is valid. See EC_CHECK_* for possible tests.
 ec_err_t ec_check(ec_cert_t *c, int checks);
 
-//compare two certificates - returns zero if equal, arbitrary nonzero otherwise
-int ec_certcmp(ec_cert_t *c1, ec_cert_t *c2);
+//compare two certificates - returns EC_OK if not equal
+ec_err_t ec_certcmp(ec_cert_t *c1, ec_cert_t *c2);
 
 //free a certificate and all attached records
 void ec_cert_destroy(ec_cert_t *c);

@@ -103,7 +103,7 @@ ec_err_t ec_export(unsigned char *dest, ec_cert_t *c, int flags) {
   *buf = '\0'; buf++;
 
   //chain
-  if((flags & EC_EXPORT_CHAIN) && c->signer && ec_certcmp(c, c->signer)
+  if((flags & EC_EXPORT_CHAIN) && c->signer && !ec_certcmp(c, c->signer)
     && ((flags & EC_EXPORT_ROOT) || !(c->signer->flags & EC_CERT_TRUSTED)))
     return ec_export(buf, c->signer, flags & ~EC_EXPORT_SECRET);
 
