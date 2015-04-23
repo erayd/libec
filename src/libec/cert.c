@@ -79,8 +79,9 @@ ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t 
   unsigned char signature[crypto_sign_BYTES];
   crypto_sign_detached(signature, NULL, hash, EC_METHOD_BLAKE2B_512_BYTES, signer_sk->data);
 
-  //append signature
+  //append signature & add signer to cert
   ec_append(c, "_sign", ec_record(EC_RECORD_NOSIGN | EC_RECORD_DCOPY, (unsigned char*)"signature", 0, signature, sizeof(signature)));
+  c->signer = signer;
 
   //check signature
   return ec_check(c, EC_CHECK_SIGNED);
