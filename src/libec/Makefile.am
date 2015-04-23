@@ -23,6 +23,8 @@ include_HEADERS = ec.h
 
 lib_LTLIBRARIES = libec.la
 
+noinst_PROGRAMS = test
+
 libec_la_LDFLAGS = -version-info 0:0:0 -lsodium
 libec_la_CFLAGS = $(AM_CFLAGS) -DTARGET_LIBEC
 libec_la_SOURCES = common.h \
@@ -35,3 +37,7 @@ libec_la_SOURCES = common.h \
                       export.c \
                       record.c \
                       role.c
+
+test_LDFLAGS = -lec
+test_CFLAGS = $(AM_CFLAGS) -DTARGET_TEST
+test_SOURCES = test.c ec.h
