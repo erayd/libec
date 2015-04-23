@@ -47,7 +47,8 @@ size_t ec_export_len(ec_cert_t *c, int flags) {
   }
 
   //add chain
-  if((flags & EC_EXPORT_CHAIN) && c->signer && ((flags & EC_EXPORT_ROOT) || !(c->signer->flags & EC_CERT_TRUSTED)))
+  if((flags & EC_EXPORT_CHAIN) && c->signer && !ec_certcmp(c, c->signer)
+    && ((flags & EC_EXPORT_ROOT) || !(c->signer->flags & EC_CERT_TRUSTED)))
     len += ec_export_len(c->signer, flags & ~EC_EXPORT_SECRET);
 
   return len;
