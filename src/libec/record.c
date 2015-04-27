@@ -19,9 +19,9 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <malloc.h>
 
 /**
- * Create a new record
+ * Create a new record with binary key & data
  */
-ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len) {
+ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len) {
   //process string input
   if(!key_len && key)
     key_len = strlent(key);
@@ -57,6 +57,20 @@ ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsi
 }
 
 /**
+ * Create a new record with string key & data
+ */
+ec_record_t *ec_record_str(uint16_t flags, char *key, char *data) {
+  return ec_record_bin(flags, (unsigned char*)key, 0, (unsigned char*)data, 0);
+}
+
+/**
+ * Create a new record with a string key
+ */
+ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t data_len) {
+  return ec_record_bin(flags, (unsigned char*)key, 0, data, data_len);
+}
+
+/**
  * Append a record to a list
  */
 ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
@@ -66,10 +80,10 @@ ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
     return c->records = r;
   }
 
-  ec_record_t *s = ec_match(c->records, NULL, EC_RECORD_SECTION, (unsigned char*)section, 0, NULL, 0);
+  ec_record_t *s = ec_match(c->records, NULL, EC_RECORD_SECTION, section, NULL, 0);
   //create section if missing
   if(!s) {
-    s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, (unsigned char*)section, 0, NULL, 0);
+    s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0);
     ec_abort(s, EC_ENOMEM, NULL);
     s->next = c->records;
     c->records = s;
@@ -86,16 +100,18 @@ ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
 }
 
 /**
- * Find the first matching record in a list
+ * Find the first matching record in a record list using binary key & data
  */
-ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len) {
+ec_record_t *ec_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len,
+  unsigned char *data, uint16_t data_len)
+{
   //process string input
   if(!key_len && key)
     key_len = strlent(key);
   if(!data_len && data)
     data_len = strlent(data);
 
-  if(section && (start = ec_match(start, NULL, EC_RECORD_SECTION, (unsigned char*)section, 0, NULL, 0)))
+  if(section && (start = ec_match(start, NULL, EC_RECORD_SECTION, section, NULL, 0)))
     start = start->next;
 
   for(ec_record_t *r = start; r; r = r->next) {
@@ -125,7 +141,43 @@ ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, unsigne
 }
 
 /**
- * Free a record
+ * Find the first matching record in a record list using string key & data
+ */
+ec_record_t *ec_match_str(ec_record_t *start, char *section, uint16_t flags, char *key, char *data) {
+  return ec_match_bin(start, section, flags, (unsigned char*)key, 0, (unsigned char*)data, 0);
+}
+
+/**
+ * Find the first matching record in a record list using string key & binary data
+ */
+ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, char *key, unsigned char *data,
+  uint16_t data_len)
+{
+  return ec_match_bin(start, section, flags, (unsigned char*)key, 0, data, data_len);
+}
+
+/**
+ * Set a string record
+ */
+ec_record_t *ec_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data) {
+  return ec_append(c, section, ec_record_str(flags, key, data));
+}
+
+/**
+ * Get the string data for a record with matching key / flags.
+ */
+char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key) {
+  ec_record_t *r = ec_match(start, section, flags, key, NULL, 0);
+  if(r && isstr(r->data, r->data_len))
+    return (char*)r->data;
+  return NULL;
+}
+
+//free a record, plus associated data if KFREE / DFREE is set
+void ec_record_destroy(ec_record_t *r);
+
+/**
+ * Free a record, plus associated data if KFREE / DFREE is set
  */
 void ec_record_destroy(ec_record_t *r) {
   if(r->flags & EC_RECORD_KFREE)

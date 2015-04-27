@@ -30,10 +30,10 @@ ec_cert_t *ec_cert(void) {
   unsigned char pk[crypto_sign_PUBLICKEYBYTES];
   unsigned char sk[crypto_sign_SECRETKEYBYTES];
   crypto_sign_keypair(pk, sk);
-  ec_append(c, "_cert", ec_record(0, (unsigned char*)"type", 0, (unsigned char*)EC_TYPE_ED25519, 0));
-  ec_append(c, "_cert", ec_record(EC_RECORD_DCOPY, (unsigned char*)"key", 0, pk, sizeof(pk)));
-  ec_append(c, NULL, ec_record(EC_RECORD_SECTION | EC_RECORD_INHERIT | EC_RECORD_NOSIGN, (unsigned char*)"_secret", 0, NULL, 0));
-  ec_append(c, "_secret", ec_record(EC_RECORD_DCOPY, (unsigned char*)"key", 0, sk, sizeof(sk)));
+  ec_set(c, "_cert", 0, "type", EC_TYPE_ED25519);
+  ec_append(c, "_cert", ec_record(EC_RECORD_DCOPY, "key", pk, sizeof(pk)));
+  ec_append(c, NULL, ec_record(EC_RECORD_SECTION | EC_RECORD_INHERIT | EC_RECORD_NOSIGN, "_secret", NULL, 0));
+  ec_append(c, "_secret", ec_record(EC_RECORD_DCOPY, "key", sk, sizeof(sk)));
   return c;
 }
 
@@ -43,7 +43,7 @@ ec_cert_t *ec_cert(void) {
 void ec_cert_id(ec_id_t id, ec_cert_t *c) {
   //type is currently always ed25519, so just get the pk and use that
   ec_abort(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
-  ec_record_t *pk = ec_match(c->records, "_cert", 0, (unsigned char*)"key", 0, NULL, crypto_sign_PUBLICKEYBYTES);
+  ec_record_t *pk = ec_match(c->records, "_cert", 0, "key", NULL, crypto_sign_PUBLICKEYBYTES);
   ec_abort(pk, EC_EINVALID, NULL);
   memcpy(id, pk->data, pk->data_len);
 }
@@ -63,16 +63,16 @@ ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t 
   rfail(ec_check(signer, EC_CHECK_CERT | EC_CHECK_SECRET));
 
   //append signature type, validity period, & signer PK
-  ec_record_t *signer_pk = ec_match(signer->records, "_cert", 0, (unsigned char*)"key", 0, NULL, 0);
-  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, (unsigned char*)"key", 0, signer_pk->data, signer_pk->data_len));
-  ec_record_t *signer_type = ec_match(signer->records, "_cert", 0, (unsigned char*)"type", 0, NULL, 0);
-  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, (unsigned char*)"type", 0, signer_type->data, signer_type->data_len));
-  ec_append(c, "_sign", ec_record(0, (unsigned char*)"method", 0, (unsigned char*)EC_METHOD_BLAKE2B_512, 0));
-  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, (unsigned char*)"from", 0, (unsigned char*)&valid_from, sizeof(valid_from)));
-  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, (unsigned char*)"until", 0, (unsigned char*)&valid_until, sizeof(valid_until)));
+  ec_record_t *signer_pk = ec_match(signer->records, "_cert", 0, "key", NULL, 0);
+  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, "key", signer_pk->data, signer_pk->data_len));
+  ec_record_t *signer_type = ec_match(signer->records, "_cert", 0, "type", NULL, 0);
+  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, "type", signer_type->data, signer_type->data_len));
+  ec_set(c, "_sign", 0, "method", EC_METHOD_BLAKE2B_512);
+  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, "from", (unsigned char*)&valid_from, sizeof(valid_from)));
+  ec_append(c, "_sign", ec_record(EC_RECORD_DCOPY, "until", (unsigned char*)&valid_until, sizeof(valid_until)));
 
   //generate signature
-  ec_record_t *signer_sk = ec_match(signer->records, "_secret", EC_RECORD_NOSIGN, (unsigned char*)"key", 0, NULL, crypto_sign_SECRETKEYBYTES);
+  ec_record_t *signer_sk = ec_match(signer->records, "_secret", EC_RECORD_NOSIGN, "key", NULL, crypto_sign_SECRETKEYBYTES);
   unsigned char hash[EC_METHOD_BLAKE2B_512_BYTES];
   if(ec_method_blake2b_512_hash(hash, c))
     return EC_EINTERNAL;
@@ -80,7 +80,7 @@ ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t 
   crypto_sign_detached(signature, NULL, hash, EC_METHOD_BLAKE2B_512_BYTES, signer_sk->data);
 
   //append signature & add signer to cert
-  ec_append(c, "_sign", ec_record(EC_RECORD_NOSIGN | EC_RECORD_DCOPY, (unsigned char*)"signature", 0, signature, sizeof(signature)));
+  ec_append(c, "_sign", ec_record(EC_RECORD_NOSIGN | EC_RECORD_DCOPY, "signature", signature, sizeof(signature)));
   c->signer = signer;
 
   //check signature
@@ -118,11 +118,11 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
     }
 
     //public key type is ed25519
-    if(!ec_match(c->records, "_cert", 0, (unsigned char*)"type", 0, (unsigned char*)EC_TYPE_ED25519, 0))
+    if(!ec_match_str(c->records, "_cert", 0, "type", EC_TYPE_ED25519))
       return EC_ETYPE;
 
     //public key is present and correct
-    if(!ec_match(c->records, "_cert", 0, (unsigned char*)"key", 0, NULL, crypto_sign_PUBLICKEYBYTES))
+    if(!ec_match(c->records, "_cert", 0, "key", NULL, crypto_sign_PUBLICKEYBYTES))
       return EC_ENOPUBLIC;
   }
 
@@ -130,7 +130,7 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
   if(checks & EC_CHECK_SECRET) {
 
     //secret key is present and correct
-    if(!ec_match(c->records, "_secret", EC_RECORD_NOSIGN, (unsigned char*)"key", 0, NULL, crypto_sign_SECRETKEYBYTES))
+    if(!ec_match(c->records, "_secret", EC_RECORD_NOSIGN, "key", NULL, crypto_sign_SECRETKEYBYTES))
       return EC_ENOSECRET;
   }
 
@@ -138,16 +138,16 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
   if(checks & EC_CHECK_SIGNED) {
 
     //signature type is ed25519
-    if(!ec_match(c->records, "_sign", 0, (unsigned char*)"type", 0, (unsigned char*)EC_TYPE_ED25519, 0))
+    if(!ec_match_str(c->records, "_sign", 0, "type", EC_TYPE_ED25519))
       return EC_ETYPE;
 
     //signing method is blake2b_512
-    if(!ec_match(c->records, "_sign", 0, (unsigned char*)"method", 0, (unsigned char*)EC_METHOD_BLAKE2B_512, 0))
+    if(!ec_match_str(c->records, "_sign", 0, "method", EC_METHOD_BLAKE2B_512))
       return EC_EMETHOD;
 
     //valid_from is present and not in the future
     uint64_t valid_from;
-    ec_record_t *valid_from_r = ec_match(c->records, "_sign", 0, (unsigned char*)"from", 0, NULL, sizeof(valid_from));
+    ec_record_t *valid_from_r = ec_match(c->records, "_sign", 0, "from", NULL, sizeof(valid_from));
     if(!valid_from_r)
       return EC_ENOVALIDITY;
     memcpy(&valid_from, valid_from_r->data, sizeof(valid_from));
@@ -156,7 +156,7 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
 
     //valid_until is present and not in the past
     uint64_t valid_until;
-    ec_record_t *valid_until_r = ec_match(c->records, "_sign", 0, (unsigned char*)"until", 0, NULL, sizeof(valid_until));
+    ec_record_t *valid_until_r = ec_match(c->records, "_sign", 0, "until", NULL, sizeof(valid_until));
     if(!valid_until_r)
       return EC_ENOVALIDITY;
     memcpy(&valid_until, valid_until_r->data, sizeof(valid_until));
@@ -164,12 +164,12 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
       return EC_EEXPIRED;
 
     //signer pk is present
-    ec_record_t *signer_pk = ec_match(c->records, "_sign", 0, (unsigned char*)"key", 0, NULL, crypto_sign_PUBLICKEYBYTES);
+    ec_record_t *signer_pk = ec_match(c->records, "_sign", 0, "key", NULL, crypto_sign_PUBLICKEYBYTES);
     if(!signer_pk)
       return EC_ENOPUBLIC;
 
     //signature is present
-    ec_record_t *signature = ec_match(c->records, "_sign", EC_RECORD_NOSIGN, (unsigned char*)"signature", 0, NULL, crypto_sign_BYTES);
+    ec_record_t *signature = ec_match(c->records, "_sign", EC_RECORD_NOSIGN, "signature", NULL, crypto_sign_BYTES);
     if(!signature)
       return EC_ENOSIGNATURE;
 
@@ -192,8 +192,8 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
       return EC_ESELF;
 
     //linked signer PK must match PK in signature
-    ec_record_t *signer_pk = ec_match(c->signer->records, "_cert", 0, (unsigned char*)"key", 0, NULL, 0);
-    ec_record_t *c_signer_pk = ec_match(c->records, "_sign", 0, (unsigned char*)"key", 0, NULL, 0);
+    ec_record_t *signer_pk = ec_match(c->signer->records, "_cert", 0, "key", NULL, 0);
+    ec_record_t *c_signer_pk = ec_match(c->records, "_sign", 0, "key", NULL, 0);
     if(!signer_pk || !c_signer_pk)
       return EC_ENOPUBLIC;
     if(signer_pk->data_len != c_signer_pk->data_len)
@@ -210,7 +210,7 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
   if(checks & EC_CHECK_ROLE) {
 
     //iterate grants
-    for(ec_record_t *r = ec_match(c->records, "_grant", 0, NULL, 0, NULL, 0); r && !(r->flags & EC_RECORD_SECTION); r = r->next) {
+    for(ec_record_t *r = ec_match_bin(c->records, "_grant", 0, NULL, 0, NULL, 0); r && !(r->flags & EC_RECORD_SECTION); r = r->next) {
 
       //grants must have a valid string key
       if(!isstr(r->key, r->key_len))
@@ -222,7 +222,7 @@ ec_err_t ec_check(ec_cert_t *c, int checks) {
     }
 
     //iterate roles
-    for(ec_record_t *r = ec_match(c->records, "_role", 0, NULL, 0, NULL, 0); r && !(r->flags & EC_RECORD_SECTION); r = r->next) {
+    for(ec_record_t *r = ec_match_bin(c->records, "_role", 0, NULL, 0, NULL, 0); r && !(r->flags & EC_RECORD_SECTION); r = r->next) {
 
       //roles must have a valid string key
       if(!isstr(r->key, r->key_len))

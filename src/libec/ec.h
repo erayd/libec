@@ -140,15 +140,34 @@ ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id);
 //remove a certificate from the local store
 ec_err_t ec_store_remove(ec_ctx_t ctx, ec_id_t id);
 
-//create a new record - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
-ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len);
+//create a new record with binary key & data - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
+ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len);
+
+//create a new record with string key & data
+ec_record_t *ec_record_str(uint16_t flags, char *key, char *data);
+
+//create a new record with a string key & binary data
+ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t data_len);
 
 //append a record to a certificate
 ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r);
 
-//find the first matching record in a record list
-ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len,
+//find the first matching record in a record list using binary key & data
+ec_record_t *ec_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len,
   unsigned char *data, uint16_t data_len);
+
+//find the first matching record in a record list using string key & data
+ec_record_t *ec_match_str(ec_record_t *start, char *section, uint16_t flags, char *key, char *data);
+
+//find the first matching record in a record list using string key & binary data
+ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, char *key, unsigned char *data,
+  uint16_t data_len);
+
+//set a string record
+ec_record_t *ec_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data);
+
+//get the string data for a record with matching key / flags.
+char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key);
 
 //free a record, plus associated data if KFREE / DFREE is set
 void ec_record_destroy(ec_record_t *r);
