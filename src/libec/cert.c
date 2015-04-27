@@ -25,7 +25,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  */
 ec_cert_t *ec_cert(void) {
   ec_cert_t *c = calloc(1, sizeof(*c));
-  ec_assert(c, EC_ENOMEM, NULL);
+  ec_abort(c, EC_ENOMEM, NULL);
   c->version = EC_CERT_VERSION;
   unsigned char pk[crypto_sign_PUBLICKEYBYTES];
   unsigned char sk[crypto_sign_SECRETKEYBYTES];
@@ -42,9 +42,9 @@ ec_cert_t *ec_cert(void) {
  */
 void ec_cert_id(ec_id_t id, ec_cert_t *c) {
   //type is currently always ed25519, so just get the pk and use that
-  ec_assert(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
+  ec_abort(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
   ec_record_t *pk = ec_match(c->records, "_cert", 0, (unsigned char*)"key", 0, NULL, crypto_sign_PUBLICKEYBYTES);
-  ec_assert(pk, EC_EINVALID, NULL);
+  ec_abort(pk, EC_EINVALID, NULL);
   memcpy(id, pk->data, pk->data_len);
 }
 
@@ -270,8 +270,8 @@ ec_err_t ec_method_blake2b_512_hash(unsigned char hash[EC_METHOD_BLAKE2B_512_BYT
   //sanity checks
   if(!c->records)
     return EC_EMISSING;
-  ec_assert(EC_METHOD_BLAKE2B_512_BYTES >= crypto_generichash_BYTES_MIN, EC_ESIZE, NULL);
-  ec_assert(EC_METHOD_BLAKE2B_512_BYTES <= crypto_generichash_BYTES_MAX, EC_ESIZE, NULL);
+  ec_abort(EC_METHOD_BLAKE2B_512_BYTES >= crypto_generichash_BYTES_MIN, EC_ESIZE, NULL);
+  ec_abort(EC_METHOD_BLAKE2B_512_BYTES <= crypto_generichash_BYTES_MAX, EC_ESIZE, NULL);
 
   uint8_t export_cert_flags = c->flags & 0xFF;
 

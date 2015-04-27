@@ -21,7 +21,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Initialise a new context
  */
 void ec_ctx_init(ec_ctx_t *ctx) {
-  ec_assert(*ctx = calloc(1, sizeof(**ctx)), EC_ENOMEM, NULL);
+  ec_abort(*ctx = calloc(1, sizeof(**ctx)), EC_ENOMEM, NULL);
 }
 
 /**
@@ -35,7 +35,7 @@ void ec_ctx_destroy(ec_ctx_t *ctx) {
  * Save a certificate in the local store
  */
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
-  ec_assert(ctx->save, EC_EUNDEFINED, NULL);
+  ec_abort(ctx->save, EC_EUNDEFINED, NULL);
   return ctx->save(c);
 }
 
@@ -43,7 +43,7 @@ ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
  * Load a certificate from the local store
  */
 ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
-  ec_assert(ctx->load, EC_EUNDEFINED, NULL);
+  ec_abort(ctx->load, EC_EUNDEFINED, NULL);
   return ctx->load(id);
 }
 
@@ -51,6 +51,6 @@ ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
  * Remove a certificate from the local store
  */
 ec_err_t ec_store_remove(ec_ctx_t ctx, ec_id_t id) {
-  ec_assert(ctx->remove, EC_EUNDEFINED, NULL);
+  ec_abort(ctx->remove, EC_EUNDEFINED, NULL);
   return ctx->remove(id);
 }

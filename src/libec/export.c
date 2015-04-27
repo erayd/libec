@@ -31,7 +31,7 @@ size_t ec_export_len(ec_cert_t *c, int flags) {
   for(ec_record_t *r = c->records; r; r = r->next) {
     //get current section
     if(r->flags & EC_RECORD_SECTION) {
-      ec_assert(isstr(r->key, r->key_len), EC_ETYPE, NULL);
+      ec_abort(isstr(r->key, r->key_len), EC_ETYPE, NULL);
       section = (char*)r->key;
     }
     //don't export secret section unless EC_EXPORT_SECRET is set
@@ -78,7 +78,7 @@ ec_err_t ec_export(unsigned char *dest, ec_cert_t *c, int flags) {
   for(ec_record_t *r = c->records; r; r = r->next) {
     //get current section
     if(r->flags & EC_RECORD_SECTION) {
-      ec_assert(isstr(r->key, r->key_len), EC_ETYPE, NULL);
+      ec_abort(isstr(r->key, r->key_len), EC_ETYPE, NULL);
       section = (char*)r->key;
     }
 
@@ -124,7 +124,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags) {
   //create empty cert object
   unsigned char *buf = src;
   ec_cert_t *c = calloc(1, sizeof(*c));
-  ec_assert(c, EC_ENOMEM, NULL);
+  ec_abort(c, EC_ENOMEM, NULL);
   
   //version & flags
   memcpy(&c->version, buf, sizeof(c->version)); buf += sizeof(c->version);
@@ -149,7 +149,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags) {
       return NULL;
     }
     //create record & set key_len, flags, data_len
-    ec_assert(*r = calloc(1, sizeof(**r)), EC_ENOMEM, NULL);
+    ec_abort(*r = calloc(1, sizeof(**r)), EC_ENOMEM, NULL);
     memcpy(&(*r)->key_len, buf, sizeof((*r)->key_len)); buf += sizeof((*r)->key_len);
     memcpy(&(*r)->flags, buf, sizeof(uint8_t)); buf += sizeof(uint8_t);
     (*r)->data_len = record_len - (*r)->key_len - EC_RECORD_OVERHEAD;
@@ -160,13 +160,13 @@ ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags) {
     //key
     if((*r)->key_len) {
       (*r)->flags |= EC_RECORD_KFREE;
-      ec_assert((*r)->key = calloc(1, (*r)->key_len), EC_ENOMEM, NULL);
+      ec_abort((*r)->key = calloc(1, (*r)->key_len), EC_ENOMEM, NULL);
       memcpy((*r)->key, buf, (*r)->key_len); buf += (*r)->key_len;
     }
     //data
     if((*r)->data_len) {
       (*r)->flags |= EC_RECORD_DFREE;
-      ec_assert((*r)->data = calloc(1, (*r)->data_len), EC_ENOMEM, NULL);
+      ec_abort((*r)->data = calloc(1, (*r)->data_len), EC_ENOMEM, NULL);
       memcpy((*r)->data, buf, (*r)->data_len); buf += (*r)->data_len;
     }
     r = &(*r)->next;

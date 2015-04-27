@@ -34,11 +34,11 @@ ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsi
 
   //build record
   ec_record_t *r = calloc(1, sizeof(*r));
-  ec_assert(r, EC_ENOMEM, NULL);
+  ec_abort(r, EC_ENOMEM, NULL);
   r->key_len = key_len;
   if(flags & EC_RECORD_KCOPY) {
     flags |= EC_RECORD_KFREE;
-    ec_assert(r->key = calloc(1, key_len), EC_ENOMEM, NULL);
+    ec_abort(r->key = calloc(1, key_len), EC_ENOMEM, NULL);
     memcpy(r->key, key, key_len);
   }
   else
@@ -46,7 +46,7 @@ ec_record_t *ec_record(uint16_t flags, unsigned char *key, uint8_t key_len, unsi
   r->data_len = data_len;
   if(flags & EC_RECORD_DCOPY) {
     flags |= EC_RECORD_DFREE;
-    ec_assert(r->data = calloc(1, data_len), EC_ENOMEM, NULL);
+    ec_abort(r->data = calloc(1, data_len), EC_ENOMEM, NULL);
     memcpy(r->data, data, data_len);
   }
   else
@@ -70,7 +70,7 @@ ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
   //create section if missing
   if(!s) {
     s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, (unsigned char*)section, 0, NULL, 0);
-    ec_assert(s, EC_ENOMEM, NULL);
+    ec_abort(s, EC_ENOMEM, NULL);
     s->next = c->records;
     c->records = s;
   }

@@ -37,7 +37,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 //assert with debug output; used *ONLY* for cases that should never fail unless
 //something is horribly wrong with the host system (e.g. out of memory, internal
 //functions not returning to-spec results etc.)
-#define ec_assert(condition, status, message) do {\
+#define ec_abort(condition, status, message) do {\
   if(!(condition)) {\
     fprintf(stderr, EC_CONSOLE_BOLD EC_CONSOLE_RED "EE [%s:%d]" EC_CONSOLE_RESET " %s\n", __FILE__, __LINE__,\
       message ?: "");\
