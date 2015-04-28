@@ -70,6 +70,7 @@ struct ec_ctx_t {
   ec_err_t (*save)(ec_ctx_t ctx, ec_cert_t *c);
   ec_cert_t *(*load)(ec_ctx_t ctx, ec_id_t id);
   ec_err_t (*remove)(ec_ctx_t ctx, ec_id_t id);
+  int flags;
 };
 
 //get the base64-armoured length for a buffer

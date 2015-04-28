@@ -38,8 +38,7 @@ int ec_abort(int cond, char *message) {
  * Basic tests
  */
 void test_basic(void) {
-  ec_ctx_t ctx;
-  ec_ctx_init(&ctx);
+  printf("\n== Basic Tests ==\n");
 
   //create & sign CA
   ec_cert_t *ca = ec_cert();
@@ -88,34 +87,34 @@ void test_basic(void) {
   ec_abort(!ec_role_has(c_end, "com.example.myRole.test"), "Test wildcard role");
   ec_abort(ec_role_has(c_end, "com.example.myOtherRole.test"), "Test wildcard fail");
   ec_abort(!ec_role_has(c_end, "com.example.myOtherRole"), "Test standard role");
-
-  ec_ctx_destroy(&ctx);
 }
 
 /**
  * Storage tests
  */
 void test_store(void) {
+  printf("\n== Local Store Tests ==\n");
+
   //set up context
-  ec_ctx_t ctx;
-  ec_ctx_init(&ctx);
+  ec_ctx_t ctx_trusted;
+  ec_ctx_init(&ctx_trusted, EC_CTX_TRUSTED);
   ec_abort(!(mkdir("test_store", 0700) && errno != EEXIST), "Create local store directory");
-  ec_abort(!ec_ctx_set_store(ctx, "file:test_store"), "Set up local cert store");
+  ec_abort(!ec_ctx_set_store(ctx_trusted, "file:test_store"), "Set up local cert store");
 
   //create & self-sign certificate
   ec_cert_t *ca = ec_cert();
+  ec_abort(ca != NULL, "Create CA cert");
   ec_sign(ca, ca, 0, 0);
 
   //save & destroy cert
   ec_id_t ca_id;
   ec_cert_id(ca_id, ca);
-  ec_abort(!ec_store_save(ctx, ca), "Save cert in local store");
+  ec_abort(!ec_store_save(ctx_trusted, ca), "Save CA in local store");
   ec_cert_destroy(ca);
 
   //load cert
-  ca = ec_store_load(ctx, ca_id);
-  ec_abort(ca != NULL, "Load cert from local store");
-  ca->flags |= EC_CERT_TRUSTED;
+  ca = ec_store_load(ctx_trusted, ca_id);
+  ec_abort(ca != NULL, "Load CA from local store");
   ec_abort(!ec_check(ca, EC_CHECK_ALL & ~EC_CHECK_SECRET), "Cert passes all checks");
 
 }

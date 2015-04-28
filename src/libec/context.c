@@ -26,8 +26,9 @@ ec_err_t ec_ctx_file_remove(ec_ctx_t ctx, ec_id_t id);
 /**
  * Initialise a new context
  */
-void ec_ctx_init(ec_ctx_t *ctx) {
+void ec_ctx_init(ec_ctx_t *ctx, int flags) {
   ec_abort(*ctx = calloc(1, sizeof(**ctx)), EC_ENOMEM, NULL);
+  (*ctx)->flags = flags;
 }
 
 /**
@@ -75,7 +76,12 @@ ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
  */
 ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
   ec_abort(ctx->load, EC_EUNDEFINED, NULL);
-  return ctx->load(ctx, id);
+  ec_cert_t *c = ctx->load(ctx, id);
+  if(!c)
+    return NULL;
+  if(ctx->flags & EC_CTX_TRUSTED)
+    c->flags |= EC_CERT_TRUSTED;
+  return c;
 }
 
 /**

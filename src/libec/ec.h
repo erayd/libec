@@ -65,6 +65,10 @@ char *ec_errstr(ec_err_t errno);
 #define EC_RECORD_DCOPY (1 << 10) /*<not exported> copy data when creating record - implies DFREE*/
 #define EC_RECORD_DFREE (1 << 11) /*<not exported> free data when destroying record*/
 
+//context flags
+#define EC_CTX_TRUSTED (1 << 0) /*automatically set the trusted flag for certificates loaded
+                                  via this context*/
+
 //available tests for ec_check()
 #define EC_CHECK_CERT (1 << 0) /*check basic certificate structure - is enabled by default*/
 #define EC_CHECK_SECRET (1 << 1) /*check that the certificate has a valid secret*/
@@ -128,7 +132,7 @@ typedef unsigned char ec_id_t[32];
 typedef struct ec_ctx_t *ec_ctx_t;
 
 //initialise a new context
-void ec_ctx_init(ec_ctx_t *ctx);
+void ec_ctx_init(ec_ctx_t *ctx, int flags);
 
 //destroy a context
 void ec_ctx_destroy(ec_ctx_t *ctx);
