@@ -70,3 +70,12 @@ struct ec_ctx_t {
   ec_cert_t *(*load)(ec_id_t id);
   ec_err_t (*remove)(ec_id_t id);
 };
+
+//get the base64-armoured length for a buffer
+size_t ec_base64_len(size_t length);
+
+//encode a buffer into a base64 string
+void ec_base64_encode(char *dest, unsigned char *src, size_t length);
+
+//decode a base64 string into a buffer
+void ec_base64_decode(unsigned char *dest, char *src, size_t length);
