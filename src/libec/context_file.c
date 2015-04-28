@@ -60,13 +60,12 @@ ec_cert_t *ec_ctx_file_load(ec_ctx_t ctx, ec_id_t id) {
   unsigned char *buf;
   size_t length;
   ec_cert_t *c;
-  if(ec_file_get(&buf, &length, path) || !(c = ec_import(buf, length, 0))) {
-    free(path);
-    return NULL;
-  }
-  free(path);
+  ec_err_t result = ec_file_get(&buf, &length, path);
+  if(!result)
+    c = ec_import(buf, length, 0);
   free(buf);
-  return c;
+  free(path);
+  return (result || !c) ? NULL : c;
 }
 
 /**

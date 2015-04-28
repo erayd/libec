@@ -37,17 +37,22 @@ ec_err_t ec_file_put(char *path, unsigned char *buf, size_t length) {
  */
 ec_err_t ec_file_get(unsigned char **buf, size_t *length, char *path) {
   FILE *fp = fopen(path, "r");
+  ec_err_t rclose(ec_err_t err) {
+    if(fp)
+      fclose(fp);
+    return err;
+  }
   if(!fp || fseek(fp, 0, SEEK_END))
-    return EC_EFILE;
-  *length = ftell(fp);
+    return rclose(EC_EFILE);
+  long tellpos = ftell(fp);
   rewind(fp);
-  if(*length == 0)
-    return EC_EEMPTY;
-  else if(*length < 0)
-    return EC_EFILE;
-  ec_abort(*buf = malloc(*length), EC_ENOMEM, NULL);
+  if(tellpos <= 0)
+    return rclose(tellpos == 0 ? EC_EEMPTY : EC_EFILE);
+  ec_abort(*buf = malloc(tellpos), EC_ENOMEM, NULL);
+  *length = tellpos;
   size_t i = 0;
   for(; i < *length; i += fread(&(*buf)[i], 1, *length - i, fp));
+  fclose(fp);
   if(i < *length) {
     free(*buf);
     return EC_EFILE;

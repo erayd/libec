@@ -19,6 +19,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <errno.h>
 
 /**
  * Print test result
@@ -98,7 +99,7 @@ void test_store(void) {
   //set up context
   ec_ctx_t ctx;
   ec_ctx_init(&ctx);
-  mkdir("test_store", 0700);
+  ec_abort(!(mkdir("test_store", 0700) && errno != EEXIST), "Create local store directory");
   ec_abort(!ec_ctx_set_store(ctx, "file:test_store"), "Set up local cert store");
 
   //create & self-sign certificate
