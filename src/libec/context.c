@@ -16,6 +16,12 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #include <common.h>
 #include <malloc.h>
+#include <string.h>
+
+ec_err_t ec_ctx_file_init(ec_ctx_t ctx, char *location);
+ec_err_t ec_ctx_file_save(ec_ctx_t ctx, ec_cert_t *c);
+ec_cert_t *ec_ctx_file_load(ec_ctx_t ctx, ec_id_t id);
+ec_err_t ec_ctx_file_remove(ec_ctx_t ctx, ec_id_t id);
 
 /**
  * Initialise a new context
@@ -32,11 +38,36 @@ void ec_ctx_destroy(ec_ctx_t *ctx) {
 }
 
 /**
+ * Set the certificate store location / type
+ */
+ec_err_t ec_ctx_set_store(ec_ctx_t ctx, char *store) {
+  char method[strlent(store)];
+  strcpy(method, store);
+  char *location = strchr(method, ':');
+  *location++ = '\0';
+
+  if(!strcmp(method, "file")) {
+    ctx->save = ec_ctx_file_save;
+    ctx->load = ec_ctx_file_load;
+    ctx->remove = ec_ctx_file_remove;
+  }
+  else
+    return EC_EUNKNOWN;
+
+  if(ctx->location)
+    free(ctx->location);
+  ec_abort(ctx->location = malloc(strlent(location)), EC_ENOMEM, NULL);
+  strcpy(ctx->location, location);
+
+  return EC_OK;
+}
+
+/**
  * Save a certificate in the local store
  */
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
   ec_abort(ctx->save, EC_EUNDEFINED, NULL);
-  return ctx->save(c);
+  return ctx->save(ctx, c);
 }
 
 /**
@@ -44,7 +75,7 @@ ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
  */
 ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
   ec_abort(ctx->load, EC_EUNDEFINED, NULL);
-  return ctx->load(id);
+  return ctx->load(ctx, id);
 }
 
 /**
@@ -52,5 +83,5 @@ ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
  */
 ec_err_t ec_store_remove(ec_ctx_t ctx, ec_id_t id) {
   ec_abort(ctx->remove, EC_EUNDEFINED, NULL);
-  return ctx->remove(id);
+  return ctx->remove(ctx, id);
 }

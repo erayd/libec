@@ -17,6 +17,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <ec.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 /**
  * Print test result
@@ -90,9 +92,39 @@ void test_basic(void) {
 }
 
 /**
+ * Storage tests
+ */
+void test_store(void) {
+  //set up context
+  ec_ctx_t ctx;
+  ec_ctx_init(&ctx);
+  mkdir("test_store", 0700);
+  ec_abort(!ec_ctx_set_store(ctx, "file:test_store"), "Set up local cert store");
+
+  //create & self-sign certificate
+  ec_cert_t *ca = ec_cert();
+  ec_sign(ca, ca, 0, 0);
+
+  //save & destroy cert
+  ec_id_t ca_id;
+  ec_cert_id(ca_id, ca);
+  ec_abort(!ec_store_save(ctx, ca), "Save cert in local store");
+  ec_cert_destroy(ca);
+
+  //load cert
+  ca = ec_store_load(ctx, ca_id);
+  ec_abort(ca != NULL, "Load cert from local store");
+  ca->flags |= EC_CERT_TRUSTED;
+  ec_abort(!ec_check(ca, EC_CHECK_ALL & ~EC_CHECK_SECRET), "Cert passes all checks");
+
+}
+
+/**
  * Main entry point
  */
 int main(int argc, char **argv) {
   test_basic();
+  test_store();
+
   return 0;
 }

@@ -34,6 +34,7 @@ libec_la_SOURCES = common.h \
                       base64.c \
                       cert.c \
                       context.c \
+                      context_file.c \
                       error.c \
                       export.c \
                       file.c \

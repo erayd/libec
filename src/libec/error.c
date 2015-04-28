@@ -49,6 +49,8 @@ char *ec_errstr(ec_err_t errno) {
     case EC_EGRANT: return "Role not granted";
     case EC_EIMPORT: return "Import error";
     case EC_EINVALID: return "Invalid data";
+    case EC_EFILE: return "File error";
+    case EC_EEMPTY: return "Empty";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

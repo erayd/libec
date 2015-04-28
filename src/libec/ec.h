@@ -50,6 +50,8 @@ char *ec_errstr(ec_err_t errno);
 #define EC_EGRANT 26 /*role not granted*/
 #define EC_EIMPORT 27 /*import error*/
 #define EC_EINVALID 28 /*invalid data*/
+#define EC_EFILE 29 /*file error*/
+#define EC_EEMPTY 30 /*empty*/
 
 //certificate flags
 #define EC_CERT_TRUSTED (1 << 8) /*<not exported> certificate is considered a trusted root*/
@@ -130,6 +132,9 @@ void ec_ctx_init(ec_ctx_t *ctx);
 
 //destroy a context
 void ec_ctx_destroy(ec_ctx_t *ctx);
+
+//set the certificate store location / type
+ec_err_t ec_ctx_set_store(ec_ctx_t ctx, char *store);
 
 //save a certificate in the local store
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c);

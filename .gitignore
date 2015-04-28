@@ -8,6 +8,7 @@
 *.tar.*
 .deps
 .libs
+test_store
 /aclocal.m4
 /autom4te.cache
 /compile
