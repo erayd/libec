@@ -79,3 +79,9 @@ void ec_base64_encode(char *dest, unsigned char *src, size_t length);
 
 //decode a base64 string into a buffer
 void ec_base64_decode(unsigned char *dest, char *src, size_t length);
+
+//put the contents of a buffer into a file
+ec_err_t ec_file_put(char *path, unsigned char *buf, size_t length);
+
+//get the contents of a file into a malloc()d buffer
+ec_err_t ec_file_get(unsigned char **buf, size_t *length, char *path);

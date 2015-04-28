@@ -36,6 +36,7 @@ libec_la_SOURCES = common.h \
                       context.c \
                       error.c \
                       export.c \
+                      file.c \
                       record.c \
                       role.c
 
