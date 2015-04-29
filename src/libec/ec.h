@@ -106,8 +106,8 @@ char *ec_errstr(ec_err_t errno);
 #define EC_RECORD_DMAX (EC_RECORD_MAX - EC_RECORD_KMAX - EC_RECORD_OVERHEAD) /*max length of record data*/
 
 //base64 export envelope
-#define EC_EXPORT_BEGIN "---------------- BEGIN EXPORTED EC CERTIFICATE ----------------"
-#define EC_EXPORT_END "---------------- END EXPORTED EC CERTIFICATE ----------------"
+#define EC_EXPORT_BEGIN "--------------------- BEGIN EXPORTED EC CERTIFICATE --------------------"
+#define EC_EXPORT_END "---------------------- END EXPORTED EC CERTIFICATE ---------------------"
 
 //certificate type
 typedef struct ec_cert_t {
@@ -227,6 +227,15 @@ ec_err_t ec_export(unsigned char *dest, ec_cert_t *c, int flags);
 
 //import a certificate
 ec_cert_t *ec_import(ec_ctx_t ctx, unsigned char *src, size_t src_len, int flags);
+
+//get the export length for a base64-encoded certificate
+size_t ec_export_len_64(ec_cert_t *c, int flags);
+
+//export a certificate encoded as base64
+ec_err_t ec_export_64(char *dest, ec_cert_t *c, int flags);
+
+//import a base64 encoded certificate
+ec_cert_t *ec_import_64(ec_ctx_t ctx, char *src, size_t src_len, int flags);
 
 /* +++++++++++++++ EXPORTED DATA LAYOUT V1 +++++++++++++++
    

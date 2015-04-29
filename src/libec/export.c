@@ -186,3 +186,84 @@ ec_cert_t *ec_import(ec_ctx_t ctx, unsigned char *src, size_t src_len, int flags
 
   return c;
 }
+
+/**
+ * Get the export length for a base64-encoded certificate
+ */
+size_t ec_export_len_64(ec_cert_t *c, int flags) {
+  size_t length = ec_export_len(c, flags);
+  length = ec_base64_len(length);
+  length += length / 72 + ((length % 72) ? 1 : 0);
+  length += strlent(EC_EXPORT_BEGIN);
+  length += strlent(EC_EXPORT_END);
+  length++;
+  return length;
+}
+
+/**
+ * Export a certificate encoded as base64
+ */
+ec_err_t ec_export_64(char *dest, ec_cert_t *c, int flags) {
+  unsigned char buf[ec_export_len(c, flags)];
+  rfail(ec_export(buf, c, flags));
+  char buf64[ec_base64_len(sizeof(buf))];
+  ec_base64_encode(buf64, buf, sizeof(buf));
+
+  strcpy(dest, EC_EXPORT_BEGIN);
+  strcat(dest, "\n");
+  dest += strlen(dest);
+
+  for(char *src = buf64; (src - buf64) < sizeof(buf64);) {
+    size_t bytes = sizeof(buf64) - (src - buf64);
+    if(bytes > 72)
+      bytes = 72;
+    memcpy(dest, src, bytes);
+    dest += bytes;
+    src += bytes;
+    *dest++ = '\n';
+  }
+
+  strcpy(dest, EC_EXPORT_END);
+  strcat(dest, "\n");
+
+  return EC_OK;
+}
+
+/**
+ * Import a base64 encoded certificate
+ */
+ec_cert_t *ec_import_64(ec_ctx_t ctx, char *src, size_t src_len, int flags) {
+  char *next(char *s) {
+    while(*s++);
+    return s;
+  }
+
+  char buf[src_len + 1];
+  memcpy(buf, src, src_len);
+  buf[src_len] = '\0';
+
+  //split into one string for each line
+  for(int i = 0; i < sizeof(buf); i++) {
+    if(buf[i] == '\n')
+      buf[i] = '\0';
+  }
+
+  //decode lines into buffer
+  unsigned char buf_decoded[sizeof(buf)];
+  unsigned char *pos = buf_decoded;
+  int in_cert = 0;
+  for(char *line = buf; line - buf < sizeof(buf); line = next(line)) {
+    if(in_cert) {
+      if(!strcmp(line, EC_EXPORT_END))
+        break;
+      pos += ec_base64_decode(pos, line, strlen(line));
+    }
+    else {
+      if(!strcmp(line, EC_EXPORT_BEGIN))
+        in_cert = 1;
+    }
+  }
+
+  //import and return certificate
+  return ec_import(ctx, buf_decoded, pos - buf_decoded, flags);
+}
