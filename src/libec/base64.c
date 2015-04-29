@@ -27,48 +27,52 @@ size_t ec_base64_len(size_t length) {
 /**
  * Encode src as base64 into dest
  */
-void ec_base64_encode(char *dest, unsigned char *src, size_t length) {
+size_t ec_base64_encode(char *dest, unsigned char *src, size_t length) {
   const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+  char *pos = dest;
   while(length) {
-    *dest++ = table[0x3F & (src[0] >> 2)];
+    *pos++ = table[0x3F & (src[0] >> 2)];
     if(length >= 3) {
-      *dest++ = table[0x3F & (src[0] << 4) | 0x3F & (src[1] >> 4)];
-      *dest++ = table[0x3F & (src[1] << 2) | 0x3F & (src[2] >> 6)];
-      *dest++ = table[0x3F & src[2]];
+      *pos++ = table[0x3F & (src[0] << 4) | 0x3F & (src[1] >> 4)];
+      *pos++ = table[0x3F & (src[1] << 2) | 0x3F & (src[2] >> 6)];
+      *pos++ = table[0x3F & src[2]];
       length -= 3;
       src += 3;
       continue;
     }
     if(length == 2) {
-      *dest++ = table[0x3F & (src[0] << 4) | 0x3F & (src[1] >> 4)];
-      *dest++ = table[0x3F & (src[1] << 2)];
-      *dest++ = '=';
+      *pos++ = table[0x3F & (src[0] << 4) | 0x3F & (src[1] >> 4)];
+      *pos++ = table[0x3F & (src[1] << 2)];
+      *pos++ = '=';
     }
     else {
-      *dest++ = table[0x3F & (src[0] << 4)];
-      *dest++ = '=';
-      *dest++ = '=';
+      *pos++ = table[0x3F & (src[0] << 4)];
+      *pos++ = '=';
+      *pos++ = '=';
     }
     break;
   }
+  return pos - dest;
 }
 
 /**
  * Decode base64 src into dest
  */
-void ec_base64_decode(unsigned char *dest, char *src, size_t length) {
+size_t ec_base64_decode(unsigned char *dest, char *src, size_t length) {
   unsigned char table(char c) {
     const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
     return strchr(table, c) - table;
   }
+  unsigned char *pos = dest;
   while(length >= 4) {
-    *dest++ = table(src[0]) << 2 | table(src[1]) >> 4;
+    *pos++ = table(src[0]) << 2 | table(src[1]) >> 4;
     if(src[2] != '=') {
-      *dest++ = table(src[1]) << 4 | table(src[2]) >> 2;
+      *pos++ = table(src[1]) << 4 | table(src[2]) >> 2;
       if(src[3] != '=')
-        *dest++ = table(src[2]) << 6 | table(src[3]);
+        *pos++ = table(src[2]) << 6 | table(src[3]);
     }
     src += 4;
     length -= 4;
   }
+  return pos - dest;
 }

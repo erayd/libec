@@ -78,10 +78,10 @@ struct ec_ctx_t {
 size_t ec_base64_len(size_t length);
 
 //encode a buffer into a base64 string
-void ec_base64_encode(char *dest, unsigned char *src, size_t length);
+size_t ec_base64_encode(char *dest, unsigned char *src, size_t length);
 
 //decode a base64 string into a buffer
-void ec_base64_decode(unsigned char *dest, char *src, size_t length);
+size_t ec_base64_decode(unsigned char *dest, char *src, size_t length);
 
 //put the contents of a buffer into a file
 ec_err_t ec_file_put(char *path, unsigned char *buf, size_t length);
