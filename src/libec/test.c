@@ -38,7 +38,7 @@ int ec_abort(int cond, char *message) {
  * Basic tests
  */
 void test_basic(void) {
-  printf("\n== Basic Tests ==\n");
+  fprintf(stderr, "\n== Basic Tests ==\n");
 
   //create & sign CA
   ec_cert_t *ca = ec_cert();
@@ -98,7 +98,7 @@ void test_basic(void) {
  * Storage tests
  */
 void test_store(void) {
-  printf("\n== Local Store Tests ==\n");
+  fprintf(stderr, "\n== Local Store Tests ==\n");
 
   //set up CA context
   ec_ctx_t ctx_trusted;
