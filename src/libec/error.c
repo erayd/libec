@@ -51,6 +51,7 @@ char *ec_errstr(ec_err_t errno) {
     case EC_EINVALID: return "Invalid data";
     case EC_EFILE: return "File error";
     case EC_EEMPTY: return "Empty";
+    case EC_ENOCID: return "No certificate ID";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

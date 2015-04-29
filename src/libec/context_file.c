@@ -61,11 +61,12 @@ ec_cert_t *ec_ctx_file_load(ec_ctx_t ctx, ec_id_t id) {
   size_t length;
   ec_cert_t *c;
   ec_err_t result = ec_file_get(&buf, &length, path);
-  if(!result)
-    c = ec_import(buf, length, 0);
-  free(buf);
   free(path);
-  return (result || !c) ? NULL : c;
+  if(result)
+    return NULL;
+  c = ec_import(ctx, buf, length, 0);
+  free(buf);
+  return c;
 }
 
 /**

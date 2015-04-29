@@ -40,12 +40,27 @@ ec_cert_t *ec_cert(void) {
 /**
  * Get the unique ID for a certificate and store into 'id'
  */
-void ec_cert_id(ec_id_t id, ec_cert_t *c) {
+ec_err_t ec_cert_id(ec_id_t id, ec_cert_t *c) {
   //type is currently always ed25519, so just get the pk and use that
   ec_abort(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
   ec_record_t *pk = ec_match(c->records, "_cert", 0, "key", NULL, crypto_sign_PUBLICKEYBYTES);
-  ec_abort(pk, EC_EINVALID, NULL);
+  if(!pk)
+    return EC_EINVALID;
   memcpy(id, pk->data, pk->data_len);
+  return EC_OK;
+}
+
+/**
+ * Get the unique ID for a certificate's signer and store into 'id'
+ */
+ec_err_t ec_cert_signer_id(ec_id_t id, ec_cert_t *c) {
+  //type is currently always ed25519, so just get the pk and use that
+  ec_abort(crypto_sign_PUBLICKEYBYTES == 32, EC_ESIZE, NULL);
+  ec_record_t *pk = ec_match(c->records, "_sign", 0, "key", NULL, crypto_sign_PUBLICKEYBYTES);
+  if(!pk)
+    return EC_EINVALID;
+  memcpy(id, pk->data, pk->data_len);
+  return EC_OK;
 }
 
 /**
@@ -260,6 +275,8 @@ void ec_cert_destroy(ec_cert_t *c) {
     n = r->next;
     ec_record_destroy(r);
   }
+  if(c->signer && (c->flags & EC_CERT_FSIGNER))
+    ec_cert_destroy(c->signer);
   free(c);
 }
 

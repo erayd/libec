@@ -114,7 +114,7 @@ ec_err_t ec_export(unsigned char *dest, ec_cert_t *c, int flags) {
 /**
  * Import a certificate
  */
-ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags) {
+ec_cert_t *ec_import(ec_ctx_t ctx, unsigned char *src, size_t src_len, int flags) {
   //sanity check - src must be long enough, and must be a NULL-terminated string
   if(src_len <= EC_EXPORT_MIN)
     return NULL;
@@ -179,8 +179,10 @@ ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags) {
   }
 
   //import chain
-  if(flags & EC_IMPORT_CHAIN)
-    c->signer = ec_import(buf, src_len - (buf - src), flags);
+  if(flags & EC_IMPORT_CHAIN) {
+    if(c->signer = ec_import(ctx, buf, src_len - (buf - src), flags))
+      c->flags |= EC_CERT_FSIGNER;
+  }
 
   return c;
 }

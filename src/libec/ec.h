@@ -52,9 +52,11 @@ char *ec_errstr(ec_err_t errno);
 #define EC_EINVALID 28 /*invalid data*/
 #define EC_EFILE 29 /*file error*/
 #define EC_EEMPTY 30 /*empty*/
+#define EC_ENOCID 31 /*certificate ID missing*/
 
 //certificate flags
 #define EC_CERT_TRUSTED (1 << 8) /*<not exported> certificate is considered a trusted root*/
+#define EC_CERT_FSIGNER (1 << 9) /*<not exported> free signer on destroy*/
 
 //record flags
 #define EC_RECORD_SECTION (1 << 0) /*record is a section start*/
@@ -135,10 +137,13 @@ typedef struct ec_ctx_t *ec_ctx_t;
 void ec_ctx_init(ec_ctx_t *ctx, int flags);
 
 //destroy a context
-void ec_ctx_destroy(ec_ctx_t *ctx);
+void ec_ctx_destroy(ec_ctx_t ctx);
 
 //set the certificate store location / type
 ec_err_t ec_ctx_set_store(ec_ctx_t ctx, char *store);
+
+//set the next context to search when loading certs if not found in this one
+void ec_ctx_set_next(ec_ctx_t ctx, ec_ctx_t next);
 
 //save a certificate in the local store
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c);
@@ -185,7 +190,10 @@ void ec_record_destroy(ec_record_t *r);
 ec_cert_t *ec_cert(void);
 
 //get the unique ID for a certificate and store into 'id'
-void ec_cert_id(ec_id_t id, ec_cert_t *c);
+ec_err_t ec_cert_id(ec_id_t id, ec_cert_t *c);
+
+//get the unique ID for a certificate's signer and store into 'id'
+ec_err_t ec_cert_signer_id(ec_id_t id, ec_cert_t *c);
 
 //sign a certificate and set the validity period
 ec_err_t ec_sign(ec_cert_t *c, ec_cert_t *signer, uint64_t valid_from, uint64_t valid_until);
@@ -218,7 +226,7 @@ size_t ec_export_len(ec_cert_t *c, int flags);
 ec_err_t ec_export(unsigned char *dest, ec_cert_t *c, int flags);
 
 //import a certificate
-ec_cert_t *ec_import(unsigned char *src, size_t src_len, int flags);
+ec_cert_t *ec_import(ec_ctx_t ctx, unsigned char *src, size_t src_len, int flags);
 
 /* +++++++++++++++ EXPORTED DATA LAYOUT V1 +++++++++++++++
    

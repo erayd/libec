@@ -66,6 +66,7 @@ ec_err_t ec_method_blake2b_512_hash(unsigned char hash[EC_METHOD_BLAKE2B_512_BYT
 
 //context type
 struct ec_ctx_t {
+  struct ec_ctx_t *next;
   char *location;
   ec_err_t (*save)(ec_ctx_t ctx, ec_cert_t *c);
   ec_cert_t *(*load)(ec_ctx_t ctx, ec_id_t id);

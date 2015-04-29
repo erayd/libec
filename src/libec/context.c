@@ -34,8 +34,10 @@ void ec_ctx_init(ec_ctx_t *ctx, int flags) {
 /**
  * Destroy a context
  */
-void ec_ctx_destroy(ec_ctx_t *ctx) {
-  free(*ctx);
+void ec_ctx_destroy(ec_ctx_t ctx) {
+  if(ctx->location)
+    free(ctx->location);
+  free(ctx);
 }
 
 /**
@@ -64,6 +66,13 @@ ec_err_t ec_ctx_set_store(ec_ctx_t ctx, char *store) {
 }
 
 /**
+ * Set the next context to search when loading certs if not found in this one
+ */
+void ec_ctx_set_next(ec_ctx_t ctx, ec_ctx_t next) {
+  ctx->next = next;
+}
+
+/**
  * Save a certificate in the local store
  */
 ec_err_t ec_store_save(ec_ctx_t ctx, ec_cert_t *c) {
@@ -78,9 +87,16 @@ ec_cert_t *ec_store_load(ec_ctx_t ctx, ec_id_t id) {
   ec_abort(ctx->load, EC_EUNDEFINED, NULL);
   ec_cert_t *c = ctx->load(ctx, id);
   if(!c)
-    return NULL;
+    return ctx->next ? ec_store_load(ctx->next, id) : NULL;
   if(ctx->flags & EC_CTX_TRUSTED)
     c->flags |= EC_CERT_TRUSTED;
+  if(!(c->flags & EC_CERT_TRUSTED)) {
+    ec_id_t signer_id;
+    if(!ec_cert_signer_id(signer_id, c)) {
+      if(c->signer = ec_store_load(ctx, signer_id))
+        c->flags |= EC_CERT_FSIGNER;
+    }
+  }
   return c;
 }
 

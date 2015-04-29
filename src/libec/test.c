@@ -68,7 +68,7 @@ void test_basic(void) {
   memset(buf, 0, sizeof(buf));
   ec_abort(!ec_export(buf, c_end, 0), "Export cert");
   ec_cert_destroy(c_end);
-  ec_abort((c_end = ec_import(buf, sizeof(buf), EC_IMPORT_CHAIN)) != NULL, "Import cert");
+  ec_abort((c_end = ec_import(NULL, buf, sizeof(buf), EC_IMPORT_CHAIN)) != NULL, "Import cert");
   c_end->signer = c_int;
   ec_abort(!ec_check(c_end, EC_CHECK_ALL & ~EC_CHECK_SECRET), "Cert still passes all checks");
   ec_abort(ec_check(c_end, EC_CHECK_SECRET) == EC_ENOSECRET, "Secret is not present");
@@ -77,7 +77,7 @@ void test_basic(void) {
   memset(buf, 0, sizeof(buf));
   ec_abort(!ec_export(buf, c_end, EC_EXPORT_CHAIN | EC_EXPORT_TRUSTED), "Export cert with chain");
   ec_cert_destroy(c_end);
-  ec_abort((c_end = ec_import(buf, sizeof(buf), EC_IMPORT_CHAIN)) != NULL, "Import cert with chain");
+  ec_abort((c_end = ec_import(NULL, buf, sizeof(buf), EC_IMPORT_CHAIN)) != NULL, "Import cert with chain");
   ec_abort(c_end->signer && c_end->signer->signer, "Chain is present");
   ec_abort(!(c_end->signer->signer->flags & EC_CERT_TRUSTED), "CA trust flag is not present");
   c_end->signer->signer->flags |= EC_CERT_TRUSTED;
@@ -87,6 +87,11 @@ void test_basic(void) {
   ec_abort(!ec_role_has(c_end, "com.example.myRole.test"), "Test wildcard role");
   ec_abort(ec_role_has(c_end, "com.example.myOtherRole.test"), "Test wildcard fail");
   ec_abort(!ec_role_has(c_end, "com.example.myOtherRole"), "Test standard role");
+
+  //cleanup
+  ec_cert_destroy(c_end);
+  ec_cert_destroy(c_int);
+  ec_cert_destroy(ca);
 }
 
 /**
@@ -95,28 +100,64 @@ void test_basic(void) {
 void test_store(void) {
   printf("\n== Local Store Tests ==\n");
 
-  //set up context
+  //set up CA context
   ec_ctx_t ctx_trusted;
   ec_ctx_init(&ctx_trusted, EC_CTX_TRUSTED);
   ec_abort(!(mkdir("test_store", 0700) && errno != EEXIST), "Create local store directory");
-  ec_abort(!ec_ctx_set_store(ctx_trusted, "file:test_store"), "Set up local cert store");
+  ec_abort(!(mkdir("test_store/trusted", 0700) && errno != EEXIST), "Create local store trusted directory");
+  ec_abort(!ec_ctx_set_store(ctx_trusted, "file:test_store/trusted"), "Set up trusted local cert store");
 
-  //create & self-sign certificate
+  //create & self-sign CA
   ec_cert_t *ca = ec_cert();
   ec_abort(ca != NULL, "Create CA cert");
   ec_sign(ca, ca, 0, 0);
 
-  //save & destroy cert
+  //save CA
   ec_id_t ca_id;
   ec_cert_id(ca_id, ca);
-  ec_abort(!ec_store_save(ctx_trusted, ca), "Save CA in local store");
+  ec_abort(!ec_store_save(ctx_trusted, ca), "Save CA in trusted local store");
+
+  //load CA
+  ec_cert_t *ca_test = ec_store_load(ctx_trusted, ca_id);
+  ec_abort(ca_test != NULL, "Load CA from local store");
+  ec_abort(!ec_check(ca_test, EC_CHECK_ALL & ~EC_CHECK_SECRET), "CA passes all checks");
+  ec_cert_destroy(ca_test);
+
+  //set up untrusted context
+  ec_ctx_t ctx;
+  ec_ctx_init(&ctx, 0);
+  ec_ctx_set_next(ctx, ctx_trusted);
+  ec_abort(!(mkdir("test_store/user", 0700) && errno != EEXIST), "Create local store user directory");
+  ec_abort(!ec_ctx_set_store(ctx, "file:test_store/user"), "Set up local cert store");
+
+  //create & sign intermediate cert
+  ec_cert_t *ca_int = ec_cert();
+  ec_abort(ca_int != NULL, "Create intermediate CA");
+  ec_sign(ca_int, ca, 0, 0);
+  ec_abort(!ec_store_save(ctx, ca_int), "Save cert into local store");
+
+  //create, sign & store end cert
+  ec_cert_t *c = ec_cert();
+  ec_abort(c != NULL, "Create certificate");
+  ec_sign(c, ca_int, 0, 0);
+  ec_abort(!ec_store_save(ctx, c), "Save cert into local store");
+
+  //get cert id, then destroy all certs
+  ec_id_t id;
+  ec_cert_id(id, c);
+  ec_cert_destroy(c);
+  ec_cert_destroy(ca_int);
   ec_cert_destroy(ca);
 
-  //load cert
-  ca = ec_store_load(ctx_trusted, ca_id);
-  ec_abort(ca != NULL, "Load CA from local store");
-  ec_abort(!ec_check(ca, EC_CHECK_ALL & ~EC_CHECK_SECRET), "Cert passes all checks");
-
+  //load cert from store
+  c = ec_store_load(ctx, id);
+  ec_abort(c != NULL, "Load cert from local store");
+  ec_abort(!ec_check(c, EC_CHECK_ALL & ~EC_CHECK_SECRET), "Cert passes all checks");
+  
+  //cleanup
+  ec_cert_destroy(c);
+  ec_ctx_destroy(ctx);
+  ec_ctx_destroy(ctx_trusted);
 }
 
 /**
