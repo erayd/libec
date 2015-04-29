@@ -30,7 +30,7 @@ size_t ec_base64_len(size_t length) {
 void ec_base64_encode(char *dest, unsigned char *src, size_t length) {
   const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
   while(length) {
-    dest[0] = table[0x3F & (src[0] >> 2)];
+    *dest++ = table[0x3F & (src[0] >> 2)];
     if(length >= 3) {
       *dest++ = table[0x3F & (src[0] << 4) | 0x3F & (src[1] >> 4)];
       *dest++ = table[0x3F & (src[1] << 2) | 0x3F & (src[2] >> 6)];
