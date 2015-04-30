@@ -7,6 +7,7 @@
 *.pb-c.h
 *.tar.*
 .deps
+.dirstamp
 .libs
 test_store
 /aclocal.m4

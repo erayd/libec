@@ -14,7 +14,7 @@ DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
 ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <common.h>
+#include <include/common.h>
 #include <string.h>
 #include <malloc.h>
 
@@ -34,11 +34,13 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
 
   //build record
   ec_record_t *r = calloc(1, sizeof(*r));
-  ec_abort(r, EC_ENOMEM, NULL);
+  if(!r)
+    ec_err_r(ENOMEM, NULL, NULL);
   r->key_len = key_len;
   if(flags & EC_RECORD_KCOPY) {
     flags |= EC_RECORD_KFREE;
-    ec_abort(r->key = calloc(1, key_len), EC_ENOMEM, NULL);
+    if(!(r->key = fcalloc(key_len, r)))
+      ec_err_r(ENOMEM, NULL, NULL);
     memcpy(r->key, key, key_len);
   }
   else
@@ -46,7 +48,8 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
   r->data_len = data_len;
   if(flags & EC_RECORD_DCOPY) {
     flags |= EC_RECORD_DFREE;
-    ec_abort(r->data = calloc(1, data_len), EC_ENOMEM, NULL);
+    if(!(r->data = fcalloc(data_len, r->key, r)))
+      ec_err_r(ENOMEM, NULL, NULL);
     memcpy(r->data, data, data_len);
   }
   else
@@ -83,8 +86,8 @@ ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
   ec_record_t *s = ec_match(c->records, NULL, EC_RECORD_SECTION, section, NULL, 0);
   //create section if missing
   if(!s) {
-    s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0);
-    ec_abort(s, EC_ENOMEM, NULL);
+    if(!(s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
+      ec_err_r(ENOMEM, NULL, NULL);
     s->next = c->records;
     c->records = s;
   }

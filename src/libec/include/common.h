@@ -14,9 +14,16 @@ DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
 ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#ifndef EC_COMMON_H
+#define EC_COMMON_H
+
 #include <config.h>
-#include <ec.h>
+#include <include/ec.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
+#include <error.h>
 
 //not using debug mode
 #ifndef DEBUG
@@ -34,6 +41,19 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #define EC_CONSOLE_RED "\033[31m"
 #define EC_CONSOLE_GREEN "\033[32m"
 
+//print error
+#define ec_err(error, ...) do {\
+  if(error)\
+    errno = error;\
+  error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__);\
+} while(0)
+
+//print error and return
+#define ec_err_r(error, retval, ...) do {\
+  ec_err(error, __VA_ARGS__);\
+  return retval;\
+} while(0)
+
 //assert with debug output; used *ONLY* for cases that should never fail unless
 //something is horribly wrong with the host system (e.g. out of memory, internal
 //functions not returning to-spec results etc.)
@@ -41,7 +61,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
   if(!(condition)) {\
     fprintf(stderr, EC_CONSOLE_BOLD EC_CONSOLE_RED "EE [%s:%d]" EC_CONSOLE_RESET " %s\n", __FILE__, __LINE__,\
       message ?: "");\
-    exit(status ?: EC_EASSERT);\
+    exit(status ?: EC_EUNKNOWN);\
   }\
   if(DEBUG && DEBUG_PA) {\
     fprintf(stderr, EC_CONSOLE_GREEN "OK [%s:%d]" EC_CONSOLE_RESET " %s\n", __FILE__, __LINE__,\
@@ -50,41 +70,53 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 } while(0)
 
 //if cond is nonzero, return cond
-#define rfail(cond) do {for(ec_err_t status = (ec_err_t)(cond); status;) return status;} while(0);
+#define rfail(cond) do {for(ec_err_t __status = (ec_err_t)(cond); __status;) return __status;} while(0);
 
 //strlen including NULL terminator
 #define strlent(s) (strlen((char*)s) + 1) /*strlen including NULL terminator*/
 
 //given buffer is a NULL-terminated string
-#define isstr(s, len) (len >= 1 && s[len - 1] == '\0') /*check whether a buffer of a given length is a valid string*/
-
+#define isstr(s, len) (len >= 1 && s[len - 1] == '\0') /*check whether a buffer of a given
+                                                         length is a valid string*/
 //hash length for EC_METHOD_BLAKE2B_512
 #define EC_METHOD_BLAKE2B_512_BYTES 64
 
-//hash function for EC_METHOD_BLAKE2B_512
-ec_err_t ec_method_blake2b_512_hash(unsigned char hash[EC_METHOD_BLAKE2B_512_BYTES], ec_cert_t *c);
+//layout version
+#define EC_LAYOUT_VERSION 2
 
-//context type
-struct ec_ctx_t {
-  struct ec_ctx_t *next;
-  char *location;
-  ec_err_t (*save)(ec_ctx_t ctx, ec_cert_t *c);
-  ec_cert_t *(*load)(ec_ctx_t ctx, ec_id_t id);
-  ec_err_t (*remove)(ec_ctx_t ctx, ec_id_t id);
-  int flags;
-};
+//free pointers on failure - last arg must be NULL
+int fmalloc_canary;
+#define fmalloc(size, ...) fmalloc_real(size, &fmalloc_canary, __VA_ARGS__, &fmalloc_canary)
+#define fcalloc(size, ...) fmalloc_real(size, &fmalloc_canary, __VA_ARGS__, &fmalloc_canary)
+void *fmalloc_real(size_t size, void *canary, ...);
+void *fcalloc_real(size_t size, void *canary, ...);
 
-//get the base64-armoured length for a buffer
-size_t ec_base64_len(size_t length);
+//skiplist
+#define EC_SL_MAXLEVEL (sizeof(unsigned) * CHAR_BIT)
+#define EC_SL_CURSOR_SLOTS (EC_SL_MAXLEVEL + 1)
 
-//encode a buffer into a base64 string
-size_t ec_base64_encode(char *dest, unsigned char *src, size_t length);
+typedef int (*ec_sl_compfn_t)(void *key, void *ptr);
+typedef void (*ec_sl_freefn_t)(void *data);
 
-//decode a base64 string into a buffer
-size_t ec_base64_decode(unsigned char *dest, char *src, size_t length);
+typedef union ec_sl_node_t {
+  union ec_sl_node_t *next;
+  void *data;
+} ec_sl_node_t;
 
-//put the contents of a buffer into a file
-ec_err_t ec_file_put(char *path, unsigned char *buf, size_t length);
+typedef ec_sl_node_t *ec_sl_cursor_t[EC_SL_CURSOR_SLOTS];
 
-//get the contents of a file into a malloc()d buffer
-ec_err_t ec_file_get(unsigned char **buf, size_t *length, char *path);
+typedef struct ec_sl_t {
+  ec_sl_compfn_t compfn;
+  ec_sl_node_t start[EC_SL_CURSOR_SLOTS];
+  unsigned level;
+} ec_sl_t;
+
+ec_sl_t *ec_sl_create(ec_sl_compfn_t compfn);
+void ec_sl_destroy(ec_sl_t *l, ec_sl_freefn_t freefn);
+ec_sl_cursor_t *ec_sl_cursor(ec_sl_t *l, ec_sl_cursor_t *c, void *key);
+int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data);
+void *ec_sl_get(ec_sl_t *l, void *key);
+int ec_sl_set(ec_sl_t *l, void *key, void *data);
+void ec_sl_remove(ec_sl_t *l, void *key);
+
+#endif

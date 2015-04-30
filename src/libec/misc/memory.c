@@ -15,8 +15,40 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <include/common.h>
+#include <stdarg.h>
 
-//all code with no other logical home goes here
-void test(void) {
-  return;
+/**
+ * Free pointers if malloc fails
+ */
+void *fmalloc_real(size_t size, void *canary, ...) {
+  void *p = malloc(size);
+  if(!p) {
+    va_list ap;
+    va_start(ap, canary);
+    for(void *fp = va_arg(ap, void*); fp != canary; fp = va_arg(ap, void*)) {
+      if(fp)
+        free(fp);
+    }
+    va_end(ap);
+  }
+  return p;
+}
+
+/**
+ * Free pointers if calloc fails
+ */
+void *fcalloc_real(size_t size, void *canary, ...) {
+  void *p = calloc(1, size);
+  if(!p) {
+    va_list ap;
+    va_start(ap, canary);
+    for(void *fp = va_arg(ap, void*); fp != canary; fp = va_arg(ap, void*)) {
+      if(fp)
+        free(fp);
+    }
+    for(void *fp = va_arg(ap, void*); fp; fp = va_arg(ap, void*))
+      free(fp);
+    va_end(ap);
+  }
+  return p;
 }

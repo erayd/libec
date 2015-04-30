@@ -19,7 +19,7 @@ else !DEBUG
 AM_CFLAGS = -Wall -Wno-parentheses -std=gnu99 -g -O2
 endif !DEBUG
 
-include_HEADERS = ec.h
+include_HEADERS = include/ec.h
 
 lib_LTLIBRARIES = libec.la
 
@@ -27,20 +27,20 @@ noinst_PROGRAMS = test
 
 libec_la_LDFLAGS = -version-info 0:0:0 -lsodium
 libec_la_CFLAGS = $(AM_CFLAGS) -DTARGET_LIBEC
-libec_la_SOURCES = common.h \
-		      config.h \
-                      ec.h \
-                      libec.c \
-                      base64.c \
-                      cert.c \
-                      context.c \
-                      context_file.c \
-                      error.c \
-                      export.c \
-                      file.c \
-                      record.c \
-                      role.c
+libec_la_SOURCES = config.h \
+		   include/common.h \
+                   include/ec.h \
+                   libec.c \
+                   misc/base64.c \
+                   misc/context.c \
+                   misc/error.c \
+                   misc/memory.c \
+                   misc/skiplist.c \
+                   cert/cert.c \
+                   cert/record.c \
+                   cert/role.c
 
 test_LDFLAGS = -lec
 test_CFLAGS = $(AM_CFLAGS) -DTARGET_TEST
-test_SOURCES = test.c ec.h
+test_SOURCES = include/ec.h \
+	       tests/test.c
