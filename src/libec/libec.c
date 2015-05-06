@@ -17,6 +17,3 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <include/common.h>
 
 //all code with no other logical home goes here
-void test(void) {
-  return;
-}
