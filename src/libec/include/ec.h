@@ -64,8 +64,10 @@ char *ec_errstr(ec_err_t error);
 #define EC_CHECK_ALL (~EC_CHECK_SECRET) /*all checks except SECRET*/
 
 //limits
-#define EC_EXPORT_OVERHEAD (sizeof(uint8_t) /*version*/ + sizeof(uint8_t) /*flags*/ \
-  + sizeof(uint16_t) /*certificate length*/ + sizeof(uint8_t) /*NULL terminator*/)
+#define EC_EXPORT_HEADER (sizeof(uint8_t) * 3 /*version, flags & export flags*/ \
+  + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */ \
+  + 32 * 2 /*pk & signer id*/ + 64 * 2 /*sk & signature*/)
+#define EC_EXPORT_OVERHEAD (EC_EXPORT_HEADER + 1 /* NULL terminator*/)
 #define EC_EXPORT_MIN EC_EXPORT_OVERHEAD
 #define EC_EXPORT_MAX UINT16_MAX#define EC_RECORD_MAX (UINT16_MAX - EC_EXPORT_OVERHEAD) /*max length of packed record*/
 #define EC_RECORD_MAX (UINT16_MAX - EC_EXPORT_OVERHEAD) /*max length of packed record*/
