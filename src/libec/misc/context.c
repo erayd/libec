@@ -58,7 +58,7 @@ void ec_ctx_autoload(ec_ctx_t *ctx, ec_cert_t *(*autoload)(unsigned char *id)) {
  * Save a certificate in the context store
  */
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c) {
-  return (c && !ec_sl_set(ctx->certs, ec_cert_id(c), c)) ? c : NULL;
+  return (c && !ec_sl_set(ctx->certs, ec_cert_id(c), c, (ec_sl_freefn_t)ec_cert_destroy)) ? c : NULL;
 }
 
 /**

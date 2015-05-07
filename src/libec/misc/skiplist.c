@@ -108,11 +108,14 @@ void *ec_sl_get(ec_sl_t *l, void *key) {
  *
  * Sets & returns errno on failure, otherwise returns zero.
  */
-int ec_sl_set(ec_sl_t *l, void *key, void *data) {
+int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn) {
   ec_sl_cursor_t c;
   ec_sl_cursor(l, &c, key);
-  if(c[1]->next && !l->compfn(key, c[1]->next->data))
+  if(c[1]->next && !l->compfn(key, c[1]->next->data)) {
+    if(freefn && c[1]->next->data)
+      freefn(c[1]->next->data);
     c[1]->next->data = data;
+  }
   else
     return ec_sl_insert(l, &c, data);
   return 0;
@@ -121,7 +124,7 @@ int ec_sl_set(ec_sl_t *l, void *key, void *data) {
 /**
  * Remove the element for a given key, if it exists
  */
-void ec_sl_remove(ec_sl_t *l, void *key) {
+void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
   ec_sl_cursor_t c;
   ec_sl_cursor(l, &c, key);
   ec_sl_node_t *n = c[1]->next;
@@ -130,6 +133,8 @@ void ec_sl_remove(ec_sl_t *l, void *key) {
       if(c[level]->next == n)
         c[level]->next = n[level].next;
     }
+    if(freefn && n[0].data)
+      freefn(n[0].data);
     free(n);
   }
 }
