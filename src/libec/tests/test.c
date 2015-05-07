@@ -74,6 +74,7 @@ void test_basic(void) {
   ec_abort(!ec_cert_check(ctx, ca_int, EC_CHECK_ALL | EC_CHECK_SECRET), "User cert passes all checks");
 
   //cleanup
+  ec_ctx_destroy(ctx_trusted);
   ec_ctx_destroy(ctx);
 }
 
