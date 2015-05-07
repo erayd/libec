@@ -27,9 +27,9 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
   ec_cert_t *c = calloc(1, sizeof(*c));
   if(!c)
     ec_err_r(ENOMEM, NULL, NULL);
-  if(!(c->pk = fmalloc(crypto_sign_ed25519_PUBLICKEYBYTES, c)))
+  if(!(c->pk = fmalloc(crypto_sign_PUBLICKEYBYTES, c)))
     ec_err_r(ENOMEM, NULL, NULL);
-  if(!(c->sk = fmalloc(crypto_sign_ed25519_SECRETKEYBYTES, c->pk, c)))
+  if(!(c->sk = fmalloc(crypto_sign_SECRETKEYBYTES, c->pk, c)))
     ec_err_r(ENOMEM, NULL, NULL);
   crypto_sign_ed25519_keypair(c->pk, c->sk);
   c->valid_from = valid_from ?: time(NULL);
