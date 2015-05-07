@@ -71,7 +71,13 @@ void test_basic(void) {
   ec_abort(c != NULL, "Create another user cert");
   ec_abort(ec_role_add(c, "com.example.goFishing") != NULL, "Add valid standard role");
   ec_abort(!ec_cert_sign(c, ca_int), "Sign user cert");
-  ec_abort(!ec_cert_check(ctx, ca_int, EC_CHECK_ALL | EC_CHECK_SECRET), "User cert passes all checks");
+  ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "User cert passes all checks");
+
+  //export & import
+  unsigned char buf[ec_export_len(c, EC_EXPORT_SECRET)];
+  ec_abort(ec_export(buf, c, EC_EXPORT_SECRET), "Export cert with secret");
+  ec_abort((c = ec_ctx_save(ctx, ec_import(buf, sizeof(buf)))) != NULL, "Import cert");
+  ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Imported cert passes all checks");
 
   //cleanup
   ec_ctx_destroy(ctx_trusted);

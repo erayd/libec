@@ -37,6 +37,7 @@ libec_la_SOURCES = config.h \
                    misc/memory.c \
                    misc/skiplist.c \
                    cert/cert.c \
+                   cert/export.c \
                    cert/record.c \
                    cert/role.c
 

@@ -63,13 +63,19 @@ char *ec_errstr(ec_err_t error);
 #define EC_CHECK_ROLE (1 << 4) /*check roles & grants*/
 #define EC_CHECK_ALL (~EC_CHECK_SECRET) /*all checks except SECRET*/
 
+#define EC_EXPORT_SECRET (1 << 0) /*include secret key in exported cert*/
+#define EC_EXPORT_SIGNER (1 << 1) /*include signer_id in exported cert*/
+#define EC_EXPORT_SIGNATURE (1 << 2) /*include signature in exported cert*/
+
 //limits
 #define EC_EXPORT_HEADER (sizeof(uint8_t) * 3 /*version, flags & export flags*/ \
   + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */ \
   + 32 * 2 /*pk & signer id*/ + 64 * 2 /*sk & signature*/)
 #define EC_EXPORT_OVERHEAD (EC_EXPORT_HEADER + 1 /* NULL terminator*/)
-#define EC_EXPORT_MIN EC_EXPORT_OVERHEAD
-#define EC_EXPORT_MAX UINT16_MAX#define EC_RECORD_MAX (UINT16_MAX - EC_EXPORT_OVERHEAD) /*max length of packed record*/
+#define EC_EXPORT_MIN (sizeof(uint32_t) * 3 /*version, flags & export flags*/ \
+  + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */ \
+  + 32 /*pk*/ + 1 /*NULL terminator*/)
+#define EC_EXPORT_MAX UINT16_MAX
 #define EC_RECORD_MAX (UINT16_MAX - EC_EXPORT_OVERHEAD) /*max length of packed record*/
 #define EC_RECORD_OVERHEAD (sizeof(uint16_t) /*record_len*/ + sizeof(uint8_t) /*key_len*/ + sizeof(uint8_t) /*flags*/)
 #define EC_RECORD_MIN EC_RECORD_OVERHEAD
@@ -170,28 +176,39 @@ ec_err_t ec_role_has(ec_cert_t *c, char *role);
 ec_err_t ec_role_has_grant(ec_cert_t *c, char *role);
 
 
+
+//get the required buffer length to export a certificate
+uint16_t ec_export_len(ec_cert_t *c, uint8_t export_flags);
+
+//export a certificate
+size_t ec_export(unsigned char *dest, ec_cert_t *c, uint8_t export_flags);
+
+//import a certificate
+ec_cert_t *ec_import(unsigned char *src, size_t length);
+
 /* +++++++++++++++ EXPORTED DATA LAYOUT V2 +++++++++++++++
    
    Exported trust chain certificates are appended in order of ascending
    authority (e.g. cert, signer, signer's signer etc.)
 
    === Certificate Layout ===
-    1B  (required) format version
-    1B  (required) certificate flags
+    1B  (required) layout version
     2B  (required) certificate length
+    1B  (required) certificate flags
+    1B  (required) export flags
     4B  (required) valid_from
     4B  (required) valid_until
     32B (required) ed25519 public key
-    32B (optional) ed25519 signer public key
+    32B (optional) ed25519 signer id
     64B (optional) ed25519 signature (signed blake2b 512bit hash)
     64B (optional) ed25519 secret key
     <records>
     1B (required) NULL byte
 
    === Record Layout ===
+    2B (required) record packed length
     1B (required) record flags
     1B (required) record key length
-    2B (required) record packed length
        (optional) record key
        (optional) record data
 
