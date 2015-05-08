@@ -228,6 +228,13 @@ char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags) {
 ec_cert_t *ec_import_64(char *src, size_t length) {
   const int binary_line = EC_EXPORT_LINE * 3 / 4;
 
+  //basic sanity check on length
+  const int min_length =
+    strlent(EC_EXPORT_BEGIN) + strlent(EC_EXPORT_END)
+    + ec_base64_len(EC_EXPORT_MIN);
+  if(length < min_length)
+    return NULL;
+
   //copy src & convert newlines to nulls
   char sbuf[length];
   memcpy(sbuf, src, length);
