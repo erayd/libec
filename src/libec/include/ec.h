@@ -187,6 +187,15 @@ size_t ec_export(unsigned char *dest, ec_cert_t *c, uint8_t export_flags);
 //import a certificate
 ec_cert_t *ec_import(unsigned char *src, size_t length);
 
+//get the required buffer length to export a certificate to base64
+size_t ec_export_len_64(ec_cert_t *c, uint8_t export_flags);
+
+//export a certificate to base64
+char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags);
+
+//import a cert from base64
+ec_cert_t *ec_import_64(char *src, size_t length);
+
 /* +++++++++++++++ EXPORTED DATA LAYOUT V2 +++++++++++++++
    
    Exported trust chain certificates are appended in order of ascending

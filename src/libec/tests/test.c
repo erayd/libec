@@ -79,6 +79,11 @@ void test_basic(void) {
   ec_abort((c = ec_ctx_save(ctx, ec_import(buf, sizeof(buf)))) != NULL, "Import cert");
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Imported cert passes all checks");
 
+  char buf64[ec_export_len_64(c, EC_EXPORT_SECRET)];
+  ec_abort(ec_export_64(buf64, c, EC_EXPORT_SECRET) != NULL, "Export cert to base64");
+  ec_abort((c = ec_ctx_save(ctx, ec_import_64(buf64, sizeof(buf64)))) != NULL, "Import cert from base64");
+  ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Imported cert passes all checks");
+
   //cleanup
   ec_ctx_destroy(ctx_trusted);
   ec_ctx_destroy(ctx);

@@ -19,6 +19,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <malloc.h>
 #include <sodium.h>
 
+#define EC_EXPORT_LINE 72
+
 /**
  * Get the required buffer length to export a record
  */
@@ -106,7 +108,6 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
   if(!c)
     return NULL;
 
-
   //layout version & cert exported length
   c->version = *bite(sizeof(c->version));
   uint16_t export_length = 0;
@@ -179,4 +180,78 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
   }
 
   return c;
+}
+
+/**
+ * Get the required buffer length to export a certificate to base64
+ */
+size_t ec_export_len_64(ec_cert_t *c, uint8_t export_flags) {
+  size_t length = ec_export_len(c, export_flags);
+  if(!length)
+    return 0;
+  length = ec_base64_len(length);
+  length +=
+    (length / EC_EXPORT_LINE) + ((length % EC_EXPORT_LINE) ? 1 : 0) //split into lines
+    + strlent(EC_EXPORT_BEGIN) + strlent(EC_EXPORT_END) //envelope
+    + 1; //trailing NULL
+  return length;
+}
+
+/**
+ * Export a certificate to base64
+ */
+char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags) {
+  size_t length = ec_export_len(c, export_flags);
+  if(!length)
+    return NULL;
+  unsigned char buf[length];
+  if(!ec_export(buf, c, export_flags))
+    return NULL;
+  char *pos = dest;
+  strcpy(pos, EC_EXPORT_BEGIN);
+  while(*pos++);
+  pos[-1] = '\n';
+  const int line_bin = EC_EXPORT_LINE * 3 / 4;
+  for(int i = 0; i < length; i += line_bin) {
+    int chunk = (length - i > line_bin) ? line_bin : length - i;
+    pos += ec_base64_encode(pos, &buf[i], chunk);
+    *pos++ = '\n';
+  }
+  strcpy(pos, EC_EXPORT_END);
+  strcat(pos, "\n");
+  return dest;
+}
+
+/**
+ * Import a cert from base64
+ */
+ec_cert_t *ec_import_64(char *src, size_t length) {
+  const int binary_line = EC_EXPORT_LINE * 3 / 4;
+
+  //copy src & convert newlines to nulls
+  char sbuf[length];
+  memcpy(sbuf, src, length);
+  sbuf[length-1] = '\0';
+  for(int i = 0; i < length; i++) {
+    if(sbuf[i] == '\n')
+      sbuf[i] = '\0';
+  }
+
+  unsigned char buf[length];
+  unsigned char *pos = buf;
+  int in_cert = 0;
+
+  //find certificate portion of text and decode into buf
+  for(char *line = sbuf; line - sbuf < length; line += strlent(line)) {
+    if(!in_cert && !strcmp(line, EC_EXPORT_BEGIN))
+      in_cert = 1;
+    else if(in_cert) {
+      if(!strcmp(line, EC_EXPORT_END))
+        break;
+      ec_base64_decode(pos, line, strlen(line));
+      pos += binary_line;
+    }
+  }
+
+  return ec_import(buf, sizeof(buf));
 }

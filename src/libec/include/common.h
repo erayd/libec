@@ -119,4 +119,10 @@ void *ec_sl_get(ec_sl_t *l, void *key);
 int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn);
 void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn);
 
+//base64
+#define EC_EXPORT_BEGIN "--------------------- BEGIN EXPORTED EC CERTIFICATE --------------------"
+#define EC_EXPORT_END "---------------------- END EXPORTED EC CERTIFICATE ---------------------"
+size_t ec_base64_len(size_t length);
+size_t ec_base64_encode(char *dest, unsigned char *src, size_t length);
+size_t ec_base64_decode(unsigned char *dest, char *src, size_t length);
 #endif
