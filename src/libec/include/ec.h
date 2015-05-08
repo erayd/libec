@@ -89,6 +89,7 @@ char *ec_errstr(ec_err_t error);
 typedef struct ec_ctx_t ec_ctx_t;
 typedef struct ec_cert_t ec_cert_t;
 typedef struct ec_record_t ec_record_t;
+typedef ec_cert_t *(*ec_autoload_t)(unsigned char *id);
 
 
 
@@ -99,7 +100,7 @@ ec_ctx_t *ec_ctx_create(void);
 void ec_ctx_destroy(ec_ctx_t *ctx);
 
 //set certificate autoloader
-void ec_ctx_autoload(ec_ctx_t *ctx, ec_cert_t *(*autoload)(unsigned char *id));
+void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload);
 
 //save certificate in context store
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);

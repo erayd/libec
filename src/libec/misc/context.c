@@ -50,7 +50,7 @@ void ec_ctx_destroy(ec_ctx_t *ctx) {
 /**
  * Set autoloader
  */
-void ec_ctx_autoload(ec_ctx_t *ctx, ec_cert_t *(*autoload)(unsigned char *id)) {
+void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload) {
   ctx->autoload = autoload;
 }
 
