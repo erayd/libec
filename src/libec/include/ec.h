@@ -43,6 +43,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_ENOTFOUND 16 /*no search results*/
 #define EC_EGRANT 17 /*invalid grant*/
 #define EC_ETYPE 18 /*invalid type*/
+#define EC_ESODIUM 19 /*libsodium error*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
@@ -90,6 +91,11 @@ typedef struct ec_ctx_t ec_ctx_t;
 typedef struct ec_cert_t ec_cert_t;
 typedef struct ec_record_t ec_record_t;
 typedef ec_cert_t *(*ec_autoload_t)(unsigned char *id);
+
+
+
+//nitialise library - must be called before any other function
+ec_err_t ec_init(void);
 
 
 

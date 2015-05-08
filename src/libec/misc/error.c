@@ -39,6 +39,7 @@ char *ec_errstr(ec_err_t error) {
     case EC_ENOTFOUND: return "No search results";
     case EC_EGRANT: return "Invalid grant";
     case EC_ETYPE: return "Invalid type";
+    case EC_ESODIUM: return "Error in libsodium";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

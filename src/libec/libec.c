@@ -15,5 +15,15 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <include/common.h>
+#include <sodium.h>
 
 //all code with no other logical home goes here
+
+/**
+ * Initialise library - must be called before any other function
+ */
+ec_err_t ec_init(void) {
+  if(sodium_init() == -1)
+    return EC_ESODIUM;
+  return EC_OK;
+}
