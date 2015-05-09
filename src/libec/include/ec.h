@@ -170,6 +170,9 @@ ec_record_t *ec_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char
 //get the string data for a record with matching key / flags.
 char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key);
 
+//get the section for a record
+char *ec_record_section(ec_record_t *r);
+
 //free a record, plus associated data if KFREE / DFREE is set
 void ec_record_destroy(ec_record_t *r);
 
@@ -256,6 +259,7 @@ struct ec_cert_t {
 
 struct ec_record_t {
   ec_record_t *next;
+  char *section;
   unsigned char *key;
   unsigned char *data;
   uint16_t flags;
