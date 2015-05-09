@@ -76,7 +76,7 @@ ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t 
 /**
  * Append a record to a list
  */
-ec_record_t *ec_append(ec_cert_t *c, char *section, ec_record_t *r) {
+ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
   //provided record is a section record
   if(r->flags & EC_RECORD_SECTION) {
     r->next = c->records;
@@ -163,7 +163,7 @@ ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, char *k
  * Set a string record
  */
 ec_record_t *ec_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data) {
-  return ec_append(c, section, ec_record_str(flags, key, data));
+  return ec_add(c, section, ec_record_str(flags, key, data));
 }
 
 /**
