@@ -17,12 +17,12 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <include/common.h>
 #include <string.h>
 
-ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section);
+static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section);
 
 /**
  * Check whether a certificate has a role in the given section
  */
-ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
+static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
   //identical match
   if(ec_match(ec_cert_records(c), section, 0, role, NULL, 0))
     return EC_OK;
