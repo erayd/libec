@@ -95,8 +95,9 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
     s->next = ec_cert_records(c);
     c->records = s;
   }
+
   //append record to section
-  r->section = (char*)s->key;
+  r->section = s;
   r->next = s->next;
   s->next = r;
 
@@ -195,7 +196,7 @@ char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key) {
  * Get the section for a record
  */
 char *ec_record_section(ec_record_t *r) {
-  return r->section;
+  return r->section ? (char*)r->section->key : NULL;
 }
 
 /**

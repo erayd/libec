@@ -259,7 +259,7 @@ struct ec_cert_t {
 
 struct ec_record_t {
   ec_record_t *next;
-  char *section;
+  ec_record_t *section;
   unsigned char *key;
   unsigned char *data;
   uint16_t flags;
