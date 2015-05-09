@@ -112,6 +112,10 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
 ec_record_t *ec_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len,
   unsigned char *data, uint16_t data_len)
 {
+  //sanity check
+  if(!start)
+    return NULL;
+
   //process string input
   if(!key_len && key)
     key_len = strlent(key);
