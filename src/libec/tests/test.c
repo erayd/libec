@@ -39,7 +39,7 @@ void test_basic(void) {
 
   //create a new context stack
   ec_ctx_t *ctx = ec_ctx_create();
-  ec_ctx_t *ctx_trusted = ctx->next = ec_ctx_create();
+  ec_ctx_t *ctx_trusted = ec_ctx_next(ctx, ec_ctx_create());
 
   //create & self-sign CA
   ec_cert_t *ca = ec_ctx_save(ctx_trusted, ec_cert_create(0, 0));

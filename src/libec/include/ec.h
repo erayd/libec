@@ -110,6 +110,9 @@ void ec_ctx_destroy(ec_ctx_t *ctx);
 //set certificate autoloader
 void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload);
 
+//sets the next context to search
+ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next);
+
 //save certificate in context store
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);
 

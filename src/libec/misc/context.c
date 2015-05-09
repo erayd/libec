@@ -55,6 +55,13 @@ void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload) {
 }
 
 /**
+ * Set next context
+ */
+ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next) {
+  return ctx->next = next;
+}
+
+/**
  * Save a certificate in the context store
  */
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c) {
