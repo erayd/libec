@@ -192,7 +192,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     if(!c->signature)
       return EC_ENOSIGN;
 
-    //signature is valid
+    //hash cert
     unsigned char hash[EC_METHOD_BLAKE2B_512_BYTES];
     rfail(ec_cert_hash(hash, c));
 
@@ -209,7 +209,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     if(c->valid_from < signer->valid_from || c->valid_until > signer->valid_until)
       return EC_EVALIDITY;
 
-    //validate signature
+    //signature is valid
     if(crypto_sign_verify_detached(c->signature, hash, sizeof(hash), signer->pk))
       return EC_ESIGN;
   }
