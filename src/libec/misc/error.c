@@ -40,6 +40,7 @@ char *ec_errstr(ec_err_t error) {
     case EC_EGRANT: return "Invalid grant";
     case EC_ETYPE: return "Invalid type";
     case EC_ESODIUM: return "Error in libsodium";
+    case EC_EVALIDITY: return "Bad validity period";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

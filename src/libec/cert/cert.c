@@ -205,6 +205,10 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     if(!signer)
       return EC_ESIGNER;
 
+    //validity period falls withing signer validity period
+    if(c->valid_from < signer->valid_from || c->valid_until > signer->valid_until)
+      return EC_EVALIDITY;
+
     //validate signature
     if(crypto_sign_verify_detached(c->signature, hash, sizeof(hash), signer->pk))
       return EC_ESIGN;

@@ -44,6 +44,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_EGRANT 17 /*invalid grant*/
 #define EC_ETYPE 18 /*invalid type*/
 #define EC_ESODIUM 19 /*libsodium error*/
+#define EC_EVALIDITY 20 /*bad validity period*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
