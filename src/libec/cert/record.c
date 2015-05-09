@@ -191,9 +191,6 @@ char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key) {
   return NULL;
 }
 
-//free a record, plus associated data if KFREE / DFREE is set
-void ec_record_destroy(ec_record_t *r);
-
 /**
  * Get the section for a record
  */
