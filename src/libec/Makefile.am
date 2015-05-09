@@ -19,11 +19,15 @@ else !DEBUG
 AM_CFLAGS = -Wall -Wno-parentheses -std=gnu99 -g -O2
 endif !DEBUG
 
+AM_TESTS_FD_REDIRECT = 9>&1
+
 include_HEADERS = include/ec.h
 
 lib_LTLIBRARIES = libec.la
 
-noinst_PROGRAMS = test
+check_PROGRAMS = test
+
+TESTS = $(check_PROGRAMS)
 
 libec_la_LDFLAGS = -version-info 0:0:0 -lsodium
 libec_la_CFLAGS = $(AM_CFLAGS) -DTARGET_LIBEC
