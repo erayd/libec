@@ -122,9 +122,6 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until);
 //destroy a certificate
 void ec_cert_destroy(ec_cert_t *c);
 
-//hash a certificate
-ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c);
-
 //sign a certificate
 ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer);
 

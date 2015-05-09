@@ -91,6 +91,9 @@ int fmalloc_canary;
 void *fmalloc_real(size_t size, void *canary, ...);
 void *fcalloc_real(size_t size, void *canary, ...);
 
+//certificates
+ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c);
+
 //skiplist
 #define EC_SL_MAXLEVEL (sizeof(unsigned) * CHAR_BIT)
 #define EC_SL_CURSOR_SLOTS (EC_SL_MAXLEVEL + 1)
