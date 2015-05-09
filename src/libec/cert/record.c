@@ -77,6 +77,10 @@ ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t 
  * Append a record to a list
  */
 ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
+  //sanity check
+  if(!r)
+    return NULL;
+
   //provided record is a section record
   if(r->flags & EC_RECORD_SECTION) {
     r->next = c->records;
