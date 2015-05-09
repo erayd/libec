@@ -238,8 +238,8 @@ struct ec_ctx_t {
 
 struct ec_cert_t {
   ec_record_t *records;
+  ec_id_t signer_id;
   unsigned char *pk;
-  unsigned char *signer_id;
   unsigned char *signature;
   unsigned char *sk;
   uint32_t valid_from;
