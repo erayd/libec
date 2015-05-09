@@ -98,9 +98,9 @@ ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c) {
  * Sign a certificate
  */
 ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
-  //check for signer secret key
-  if(!signer->sk)
-    return EC_ENOSK;
+  //check signer & cert for basic validity
+  rfail(ec_cert_check(NULL, c, EC_CHECK_CERT));
+  rfail(ec_cert_check(NULL, signer, EC_CHECK_CERT | EC_CHECK_SECRET));
 
   //clamp validity period
   if(c->valid_from > signer->valid_from)
