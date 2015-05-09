@@ -91,8 +91,8 @@ char *ec_errstr(ec_err_t error);
 typedef struct ec_ctx_t ec_ctx_t;
 typedef struct ec_cert_t ec_cert_t;
 typedef struct ec_record_t ec_record_t;
-typedef ec_cert_t *(*ec_autoload_t)(unsigned char *id);
 typedef unsigned char *ec_id_t;
+typedef ec_cert_t *(*ec_autoload_t)(ec_id_t id);
 
 
 
@@ -114,7 +114,7 @@ void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload);
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);
 
 //get certificate from context store
-ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, unsigned char *id);
+ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 
 
 
@@ -232,7 +232,7 @@ ec_cert_t *ec_import_64(char *src, size_t length);
 //internal structures
 struct ec_ctx_t {
   ec_ctx_t *next;
-  ec_cert_t *(*autoload)(unsigned char *id);
+  ec_cert_t *(*autoload)(ec_id_t id);
   struct ec_sl_t *certs;
 };
 
