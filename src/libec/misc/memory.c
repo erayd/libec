@@ -46,8 +46,6 @@ void *fcalloc_real(size_t size, void *canary, ...) {
       if(fp)
         free(fp);
     }
-    for(void *fp = va_arg(ap, void*); fp; fp = va_arg(ap, void*))
-      free(fp);
     va_end(ap);
   }
   return p;
