@@ -266,7 +266,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
 /**
  * Get the unique ID for a certificate - uses ed25519 public key by default
  */
-unsigned char *ec_cert_id(ec_cert_t *c) {
+ec_id_t ec_cert_id(ec_cert_t *c) {
   ec_abort(EC_CERT_ID_BYTES == crypto_sign_PUBLICKEYBYTES, EC_ESIZE, NULL);
   return c->pk;
 }

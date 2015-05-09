@@ -92,6 +92,7 @@ typedef struct ec_ctx_t ec_ctx_t;
 typedef struct ec_cert_t ec_cert_t;
 typedef struct ec_record_t ec_record_t;
 typedef ec_cert_t *(*ec_autoload_t)(unsigned char *id);
+typedef unsigned char *ec_id_t;
 
 
 
@@ -130,7 +131,7 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer);
 ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags);
 
 //get the unique ID for a certificate
-unsigned char *ec_cert_id(ec_cert_t *c);
+ec_id_t ec_cert_id(ec_cert_t *c);
 
 
 
