@@ -24,7 +24,7 @@ ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section);
  */
 ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
   //identical match
-  if(ec_match(c->records, section, 0, role, NULL, 0))
+  if(ec_match(ec_cert_records(c), section, 0, role, NULL, 0))
     return EC_OK;
 
   //wildcard match
@@ -33,13 +33,13 @@ ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
   char *pos = NULL;
   while(pos = strrchr(s, '.')) {
     strcpy(pos, ".*");
-    if(ec_match(c->records, section, 0, s, NULL, 0))
+    if(ec_match(ec_cert_records(c), section, 0, s, NULL, 0))
       return EC_OK;
     *pos = '\0';
   }
 
   //god-role match
-  if(ec_match(c->records, section, 0, "*", NULL, 0))
+  if(ec_match(ec_cert_records(c), section, 0, "*", NULL, 0))
     return EC_OK;
 
   return EC_ENOTFOUND;

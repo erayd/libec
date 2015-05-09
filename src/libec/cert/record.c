@@ -87,12 +87,12 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
     return c->records = r;
   }
 
-  ec_record_t *s = ec_match(c->records, NULL, EC_RECORD_SECTION, section, NULL, 0);
+  ec_record_t *s = ec_match(ec_cert_records(c), NULL, EC_RECORD_SECTION, section, NULL, 0);
   //create section if missing
   if(!s) {
     if(!(s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
       ec_err_r(ENOMEM, NULL, NULL);
-    s->next = c->records;
+    s->next = ec_cert_records(c);
     c->records = s;
   }
   //append record to section

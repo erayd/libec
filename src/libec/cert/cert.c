@@ -42,7 +42,7 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
  * Destroy a certificate
  */
 void ec_cert_destroy(ec_cert_t *c) {
-  ec_record_t *next = c->records;
+  ec_record_t *next = ec_cert_records(c);
   for(ec_record_t *r = next; r; r = next) {
     next = r->next;
     ec_record_destroy(r);
@@ -78,7 +78,7 @@ ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c) {
   crypto_generichash_update(&state, c->pk, crypto_sign_PUBLICKEYBYTES);
   crypto_generichash_update(&state, c->signer_id, crypto_sign_PUBLICKEYBYTES);
   //records
-  for(ec_record_t *r = c->records; r; r = r->next) {
+  for(ec_record_t *r = ec_cert_records(c); r; r = r->next) {
     //don't hash NOSIGN records
     if(r->flags & EC_RECORD_NOSIGN)
       continue;
@@ -163,7 +163,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
       return EC_ENOPK;
 
     //iterate records
-    for(ec_record_t *r = c->records; r; r = r->next) {
+    for(ec_record_t *r = ec_cert_records(c); r; r = r->next) {
 
       //records are the correct length
       if(r->key_len > EC_RECORD_KMAX || r->data_len > EC_RECORD_DMAX)
@@ -231,7 +231,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     ec_cert_t *signer = ec_ctx_cert(ctx, c->signer_id);
 
     //iterate grants
-    for(ec_record_t *r = ec_match_bin(c->records, "_grant", 0, NULL, 0, NULL, 0);
+    for(ec_record_t *r = ec_match_bin(ec_cert_records(c), "_grant", 0, NULL, 0, NULL, 0);
       r && !(r->flags & EC_RECORD_SECTION); r = r->next)
     {
 
@@ -245,7 +245,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     }
 
     //iterate roles
-    for(ec_record_t *r = ec_match_bin(c->records, "_role", 0, NULL, 0, NULL, 0);
+    for(ec_record_t *r = ec_match_bin(ec_cert_records(c), "_role", 0, NULL, 0, NULL, 0);
       r && !(r->flags & EC_RECORD_SECTION); r = r->next)
     {
 
@@ -269,4 +269,11 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
 ec_id_t ec_cert_id(ec_cert_t *c) {
   ec_abort(EC_CERT_ID_BYTES == crypto_sign_PUBLICKEYBYTES, EC_ESIZE, NULL);
   return c->pk;
+}
+
+/**
+ * Get the record list for a certificate
+ */
+ec_record_t *ec_cert_records(ec_cert_t *c) {
+  return c->records;
 }
