@@ -9,7 +9,9 @@
 .deps
 .dirstamp
 .libs
-test_store
+test-suite.log
+test.log
+test.trs
 /aclocal.m4
 /autom4te.cache
 /compile
