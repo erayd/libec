@@ -93,6 +93,7 @@ void test_basic(void) {
  * Main entry point
  */
 int main(int argc, char **argv) {
+  ec_abort(!ec_init(), "Initialise libec");
   test_basic();
 
   return 0;
