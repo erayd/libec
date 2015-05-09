@@ -118,9 +118,15 @@ ec_record_t *ec_match_bin(ec_record_t *start, char *section, uint16_t flags, uns
   if(!data_len && data)
     data_len = strlent(data);
 
+  //if section isn't defined, look for a section header
+  if(!section)
+    flags |= EC_RECORD_SECTION;
+
+  //find section header
   if(section && (start = ec_match(start, NULL, EC_RECORD_SECTION, section, NULL, 0)))
     start = start->next;
 
+  //search records
   for(ec_record_t *r = start; r; r = r->next) {
     //stop searching on section boundary
     if((r->flags & EC_RECORD_SECTION) && !(flags & EC_RECORD_SECTION))
