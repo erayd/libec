@@ -19,8 +19,6 @@ else !DEBUG
 AM_CFLAGS = -Wall -Wno-parentheses -std=gnu99 -g -O2
 endif !DEBUG
 
-AM_TESTS_FD_REDIRECT = 9>&1
-
 include_HEADERS = include/ec.h
 
 lib_LTLIBRARIES = libec.la
