@@ -20,7 +20,6 @@ before_script:
 script:
   - ./configure
   - make check
-  - ./src/libec/test
   - sudo make install
   - sudo ldconfig
 
