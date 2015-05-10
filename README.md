@@ -8,7 +8,7 @@
 
 #libec
 Libec is a simple PKI library leveraging [libsodium](https://github.com/jedisct1/libsodium).
-Documentation is available [here](http://erayd.gitbooks.io/libec-doc/).
+Documentation is available [here](http://libec.erayd.net/), and ebook / PDF files are  [here](http://download.libec.erayd.net/).
 
 ##Support
 For development support, questions etc. please use the [mailing list](https://groups.google.com/a/erayd.net/forum/#!forum/libec).
