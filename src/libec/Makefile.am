@@ -25,7 +25,7 @@ include_HEADERS = include/ec.h
 
 lib_LTLIBRARIES = libec.la
 
-libec_la_LDFLAGS = -version-info 0:0:0 -lsodium
+libec_la_LDFLAGS = -version-info 0:0:0
 libec_la_CFLAGS = $(AM_CFLAGS) -DTARGET_LIBEC
 libec_la_SOURCES = config.h \
 		   include/common.h \
