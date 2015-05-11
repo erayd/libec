@@ -39,6 +39,7 @@ AS_IF([test "x$enable_pa" != xno], [
 
 # Checks for pkgconfig modules
 PKG_CHECK_MODULES([SODIUM], [libsodium >= 1.0.0] , , [AC_MSG_ERROR([libsodium must be at least v1.0.0!])])
+PKG_CHECK_MODULES([TALLOC], [talloc >= 2.0.0] , , [AC_MSG_ERROR([talloc must be at least v2.0.0!])])
 
 # Checks for programs.
 AC_PROG_LIBTOOL
@@ -47,9 +48,11 @@ AM_PROG_CC_C_O
 
 # Checks for libraries.
 AC_CHECK_LIB([sodium], [main], [], [AC_MSG_ERROR([libsodium is missing!])])
+AC_CHECK_LIB([talloc], [main], [], [AC_MSG_ERROR([libtalloc is missing!])])
 
 # Checks for header files.
 AC_CHECK_HEADER([sodium.h], [], [AC_MSG_ERROR([sodium.h is missing!])])
+AC_CHECK_HEADER([talloc.h], [], [AC_MSG_ERROR([talloc.h is missing!])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 
