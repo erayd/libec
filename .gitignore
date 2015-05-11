@@ -25,7 +25,11 @@
 /m4
 /missing
 /src/config.h
-/src/libec/test
+/src/libec/tests/cert
+/src/libec/tests/cert_chain
+/src/libec/tests/ctx
+/src/libec/tests/export
+/src/libec/tests/role
 /test-driver
 config.log
 Makefile
