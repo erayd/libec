@@ -159,15 +159,20 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
     memcpy(&record_length, bite(sizeof(record_length)), sizeof(record_length));
     if(record_length >= length + sizeof(record_length))
       break;
-    if(!((*r) = calloc(1, sizeof(**r) + record_length - EC_RECORD_MIN)))
-      break;
+
+    if(!((*r) = talloc_zero(c, ec_record_t))) {
+      ec_cert_destroy(c);
+      ec_err_r(ENOMEM, NULL, NULL);
+    }
     (*r)->flags = *bite(sizeof(uint8_t));
     (*r)->key_len = *bite(sizeof((*r)->key_len));
     (*r)->data_len = record_length - EC_RECORD_MIN - (*r)->key_len;
-    (*r)->key = (unsigned char*)((*r) + 1);
-    memcpy((*r)->key, bite((*r)->key_len), (*r)->key_len);
-    (*r)->data = (*r)->key + (*r)->key_len;
-    memcpy((*r)->data, bite((*r)->data_len), (*r)->data_len);
+    (*r)->key = talloc_memdup(*r, bite((*r)->key_len), (*r)->key_len);
+    (*r)->data = talloc_memdup(*r, bite((*r)->data_len), (*r)->data_len);
+    if(!(*r)->key || !(*r)->data) {
+      ec_cert_destroy(c);
+      ec_err_r(ENOMEM, NULL, NULL);
+    }
   }
 
   //NULL terminator && no remaining data && cert passes basic checks
