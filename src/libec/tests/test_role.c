@@ -49,5 +49,8 @@ int main(void) {
   ec_abort(ec_role_has(c, "com.example.three.six"), "Role com.example.three.six is missing");
   ec_abort(!ec_role_has(c, "com.example.three.four.seven"), "Role com.example.three.four.seven is present");
 
+  //cleanup
+  ec_ctx_destroy(ctx);
+
   return 0;
 }
