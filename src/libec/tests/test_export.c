@@ -37,5 +37,7 @@ int main(void) {
   ec_abort(c = ec_import_64(buf, sizeof(buf)), "Import cert");
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Cert passes all checks");
 
+  ec_ctx_destroy(ctx);
+
   return 0;
 }
