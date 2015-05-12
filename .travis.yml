@@ -5,6 +5,7 @@ os: linux
 compiler: gcc
 
 before_install:
+  - sudo apt-get install libtalloc2
   - git clone https://github.com/jedisct1/libsodium.git
   - cd libsodium
   - git checkout 1.0.2
