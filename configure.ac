@@ -19,6 +19,7 @@ AC_CONFIG_SRCDIR([src/libec/libec.c])
 AC_INIT([libec], [0.1.0-dev], [steve@erayd.net], [libec], [https://github.com/erayd/libec/])
 LT_INIT
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Features
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging]), [], [enable_debug=no])
