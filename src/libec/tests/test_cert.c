@@ -31,13 +31,13 @@ int main(void) {
   ec_cert_destroy(c);
 
   //valid_from in future
-  ec_cert_create(time(NULL) + 10, 0);
+  c = ec_cert_create(time(NULL) + 10, 0);
   ec_abort(c, "Create certificate");
   ec_abort(ec_cert_check(NULL, c, EC_CHECK_CERT) == EC_EFUTURE, "Check fails with EC_EFUTURE");
   ec_cert_destroy(c);
 
   //valid_until in past
-  ec_cert_create(time(NULL) - 100, time(NULL) - 10);
+  c = ec_cert_create(time(NULL) - 100, time(NULL) - 10);
   ec_abort(c, "Create certificate");
   ec_abort(ec_cert_check(NULL, c, EC_CHECK_CERT) == EC_EEXPIRED, "Check fails with EC_EEXPIRED");
   ec_cert_destroy(c);
