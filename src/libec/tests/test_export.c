@@ -34,7 +34,7 @@ int main(void) {
 
   char buf[ec_export_len_64(c, EC_EXPORT_SECRET)];
   ec_abort(ec_export_64(buf, c, EC_EXPORT_SECRET), "Export cert");
-  ec_abort(c = ec_import_64(buf, sizeof(buf)), "Import cert");
+  ec_abort(c = ec_ctx_save(ctx, ec_import_64(buf, sizeof(buf))), "Import cert");
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Cert passes all checks");
 
   ec_ctx_destroy(ctx);
