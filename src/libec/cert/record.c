@@ -16,7 +16,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #include <include/common.h>
 #include <string.h>
-#include <malloc.h>
+#include <talloc.h>
 
 /**
  * Create a new record with binary key & data
@@ -33,24 +33,26 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
     data_len = EC_RECORD_DMAX;
 
   //build record
-  ec_record_t *r = calloc(1, sizeof(*r));
+  ec_record_t *r = talloc_zero(NULL, ec_record_t);
   if(!r)
     ec_err_r(ENOMEM, NULL, NULL);
   r->key_len = key_len;
   if(flags & EC_RECORD_KCOPY) {
-    flags |= EC_RECORD_KFREE;
-    if(!(r->key = fcalloc(key_len, r)))
+    flags &= ~EC_RECORD_KFREE;
+    if(!(r->key = talloc_memdup(r, key, key_len))) {
+      talloc_free(r);
       ec_err_r(ENOMEM, NULL, NULL);
-    memcpy(r->key, key, key_len);
+    }
   }
   else
     r->key = key;
   r->data_len = data_len;
   if(flags & EC_RECORD_DCOPY) {
-    flags |= EC_RECORD_DFREE;
-    if(!(r->data = fcalloc(data_len, r->key, r)))
+    flags &= ~EC_RECORD_DFREE;
+    if(!(r->data = talloc_memdup(r, data, data_len))) {
+      talloc_free(r);
       ec_err_r(ENOMEM, NULL, NULL);
-    memcpy(r->data, data, data_len);
+    }
   }
   else
     r->data = data;
@@ -80,6 +82,9 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
   //sanity check
   if(!r)
     return NULL;
+
+  //change talloc context
+  talloc_steal(c, r);
 
   //provided record is a section record
   if(r->flags & EC_RECORD_SECTION) {
@@ -207,5 +212,5 @@ void ec_record_destroy(ec_record_t *r) {
     free(r->key);
   if(r->flags & EC_RECORD_DFREE)
     free(r->data);
-  free(r);
+  talloc_free(r);
 }

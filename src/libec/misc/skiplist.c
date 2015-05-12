@@ -15,13 +15,13 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <include/common.h>
-#include <malloc.h>
+#include <talloc.h>
 
 /**
  * Create a skiplist
  */
 ec_sl_t *ec_sl_create(ec_sl_compfn_t compfn) {
-  ec_sl_t *l = calloc(1, sizeof(ec_sl_t));
+  ec_sl_t *l = talloc_zero(NULL, ec_sl_t);
   if(!l)
     ec_err_r(ENOMEM, NULL, NULL);
   l->compfn = compfn;
@@ -37,9 +37,8 @@ void ec_sl_destroy(ec_sl_t *l, ec_sl_freefn_t freefn) {
     next = n[1].next;
     if(freefn)
       freefn(n->data);
-    free(n);
   }
-  free(l);
+  talloc_free(l);
 }
 
 /**
@@ -78,7 +77,7 @@ int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data) {
     level = ++l->level;
 
   //allocate new element
-  ec_sl_node_t *n = malloc(sizeof(*n) * (level + 1));
+  ec_sl_node_t *n = talloc_array(l, ec_sl_node_t, level + 1);
   if(!n)
     ec_err_r(ENOMEM, EC_ENOMEM, NULL);
 
@@ -135,6 +134,6 @@ void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
     }
     if(freefn && n[0].data)
       freefn(n[0].data);
-    free(n);
+    talloc_free(n);
   }
 }

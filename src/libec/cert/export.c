@@ -16,7 +16,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #include <include/common.h>
 #include <string.h>
-#include <malloc.h>
+#include <talloc.h>
 #include <sodium.h>
 
 #define EC_EXPORT_LINE 72
@@ -104,7 +104,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
   }
   if(length < EC_EXPORT_MIN || (uint8_t)*src != EC_LAYOUT_VERSION)
     return NULL;
-  ec_cert_t *c = calloc(1, sizeof(*c));
+  ec_cert_t *c = talloc_zero(NULL, ec_cert_t);
   if(!c)
     return NULL;
 
@@ -128,32 +128,29 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
   memcpy(&c->valid_until, bite(sizeof(c->valid_until)), sizeof(c->valid_until));
 
   //pk
-  if(length < crypto_sign_PUBLICKEYBYTES || !(c->pk = fmalloc(crypto_sign_PUBLICKEYBYTES, c)))
+  if(length < crypto_sign_PUBLICKEYBYTES ||
+    !(c->pk = talloc_memdup(c, bite(crypto_sign_PUBLICKEYBYTES), crypto_sign_PUBLICKEYBYTES)))
     return NULL;
-  memcpy(c->pk, bite(crypto_sign_PUBLICKEYBYTES), crypto_sign_PUBLICKEYBYTES);
 
   //signer
   if(export_flags & EC_EXPORT_SIGNER) {
-    if(length < EC_CERT_ID_BYTES || !(c->signer_id = fmalloc(EC_CERT_ID_BYTES, c->pk, c)))
+    if(length < EC_CERT_ID_BYTES ||
+      !(c->signer_id = talloc_memdup(c, bite(EC_CERT_ID_BYTES), EC_CERT_ID_BYTES)))
       return NULL;
-    memcpy(c->signer_id, bite(EC_CERT_ID_BYTES), EC_CERT_ID_BYTES);
   }
 
   //signature
   if(export_flags & EC_EXPORT_SIGNATURE) {
-    if(length < crypto_sign_BYTES || !(c->signature = fmalloc(crypto_sign_BYTES, c->signer_id, c->pk, c)))
+    if(length < crypto_sign_BYTES ||
+      !(c->signature = talloc_memdup(c, bite(crypto_sign_BYTES), crypto_sign_BYTES)))
       return NULL;
-    memcpy(c->signature, bite(crypto_sign_BYTES), crypto_sign_BYTES);
   }
 
   //sk
   if(export_flags & EC_EXPORT_SECRET) {
-    if(length < crypto_sign_SECRETKEYBYTES || !(c->sk = fmalloc(crypto_sign_SECRETKEYBYTES,
-      c->signature, c->signer_id, c->pk, c)))
-    {
+    if(length < crypto_sign_SECRETKEYBYTES ||
+      !(c->sk = talloc_memdup(c, bite(crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES)))
       return NULL;
-    }
-    memcpy(c->sk, bite(crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES);
   }
 
   //records

@@ -15,7 +15,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <include/common.h>
-#include <malloc.h>
+#include <talloc.h>
 #include <sodium.h>
 #include <string.h>
 
@@ -32,7 +32,7 @@ static int _compfn(void *key, void *ptr) {
  * Create a new context
  */
 ec_ctx_t *ec_ctx_create(void) {
-  ec_ctx_t *ctx = calloc(1, sizeof(*ctx));
+  ec_ctx_t *ctx = talloc_zero(NULL, ec_ctx_t);
   if(!ctx)
     ec_err_r(ENOMEM, NULL, NULL);
   ctx->certs = ec_sl_create(_compfn);
@@ -44,7 +44,7 @@ ec_ctx_t *ec_ctx_create(void) {
  */
 void ec_ctx_destroy(ec_ctx_t *ctx) {
   ec_sl_destroy(ctx->certs, (ec_sl_freefn_t)ec_cert_destroy);
-  free(ctx);
+  talloc_free(ctx);
 }
 
 /**
@@ -65,7 +65,11 @@ ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next) {
  * Save a certificate in the context store
  */
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c) {
-  return (c && !ec_sl_set(ctx->certs, ec_cert_id(c), c, (ec_sl_freefn_t)ec_cert_destroy)) ? c : NULL;
+  if(c && !ec_sl_set(ctx->certs, ec_cert_id(c), c, (ec_sl_freefn_t)ec_cert_destroy)) {
+    talloc_steal(ctx, c);
+    return c;
+  }
+  return NULL;
 }
 
 /**

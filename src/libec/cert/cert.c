@@ -15,7 +15,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 */
 
 #include <include/common.h>
-#include <malloc.h>
+#include <talloc.h>
 #include <sodium.h>
 #include <string.h>
 #include <time.h>
@@ -24,13 +24,15 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Create a new certificate
  */
 ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
-  ec_cert_t *c = calloc(1, sizeof(*c));
+  ec_cert_t *c = talloc_zero(NULL, ec_cert_t);
   if(!c)
     ec_err_r(ENOMEM, NULL, NULL);
-  if(!(c->pk = fmalloc(crypto_sign_PUBLICKEYBYTES, c)))
-    ec_err_r(ENOMEM, NULL, NULL);
-  if(!(c->sk = fmalloc(crypto_sign_SECRETKEYBYTES, c->pk, c)))
-    ec_err_r(ENOMEM, NULL, NULL);
+  c->pk = talloc_size(c, crypto_sign_PUBLICKEYBYTES);
+  c->sk = talloc_size(c, crypto_sign_SECRETKEYBYTES);
+  if(!c->pk || !c->sk) {
+    talloc_free(c);
+    return NULL;
+  }
   crypto_sign_ed25519_keypair(c->pk, c->sk);
   c->valid_from = valid_from ?: time(NULL);
   c->valid_until = valid_until ?: ~0LL;
@@ -47,14 +49,7 @@ void ec_cert_destroy(ec_cert_t *c) {
     next = r->next;
     ec_record_destroy(r);
   }
-  if(c->signature)
-    free(c->signature);
-  if(c->signer_id)
-    free(c->signer_id);
-  if(c->sk)
-    free(c->sk);
-  free(c->pk);
-  free(c);
+  talloc_free(c);
 }
 
 //hash a certificate
@@ -109,7 +104,7 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
     c->valid_until = signer->valid_until;
 
   //add signer data
-  if(!(c->signer_id = malloc(crypto_sign_PUBLICKEYBYTES)))
+  if(!(c->signer_id = talloc_size(c, crypto_sign_PUBLICKEYBYTES)))
     ec_err_r(ENOMEM, EC_ENOMEM, NULL);
   memcpy(c->signer_id, ec_cert_id(signer), EC_CERT_ID_BYTES);
 
@@ -118,7 +113,7 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
   rfail(ec_cert_hash(hash, c));
 
   //sign
-  if(!(c->signature = fmalloc(crypto_sign_BYTES, c->signer_id)))
+  if(!(c->signature = talloc_size(c, crypto_sign_BYTES)))
     ec_err_r(ENOMEM, EC_ENOMEM, NULL);
   crypto_sign_detached(c->signature, NULL, hash, sizeof(hash), signer->sk);
 

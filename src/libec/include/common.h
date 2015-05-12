@@ -84,13 +84,6 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 //layout version
 #define EC_LAYOUT_VERSION 2
 
-//free pointers on failure - last arg must be NULL
-int fmalloc_canary;
-#define fmalloc(size, ...) fmalloc_real(size, &fmalloc_canary, __VA_ARGS__, &fmalloc_canary)
-#define fcalloc(size, ...) fmalloc_real(size, &fmalloc_canary, __VA_ARGS__, &fmalloc_canary)
-void *fmalloc_real(size_t size, void *canary, ...);
-void *fcalloc_real(size_t size, void *canary, ...);
-
 //certificates
 ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c);
 
