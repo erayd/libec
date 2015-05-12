@@ -58,6 +58,13 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
     r->data = data;
   r->flags = flags;
 
+  //clean up on talloc free
+  int talloc_destructor(void *ptr) {
+    ec_record_destroy(ptr);
+    return 0;
+  }
+  talloc_set_destructor(r, talloc_destructor);
+
   return r;
 }
 
@@ -97,6 +104,7 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
   if(!s) {
     if(!(s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
       ec_err_r(ENOMEM, NULL, NULL);
+    talloc_steal(c, s);
     s->next = ec_cert_records(c);
     c->records = s;
   }

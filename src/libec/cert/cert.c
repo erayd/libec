@@ -44,11 +44,6 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
  * Destroy a certificate
  */
 void ec_cert_destroy(ec_cert_t *c) {
-  ec_record_t *next = ec_cert_records(c);
-  for(ec_record_t *r = next; r; r = next) {
-    next = r->next;
-    ec_record_destroy(r);
-  }
   talloc_free(c);
 }
 
