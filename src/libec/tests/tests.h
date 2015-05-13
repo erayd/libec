@@ -24,8 +24,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #define ec_abort(cond, message) do { \
   if(cond) \
     fprintf(stderr, "\033[32mOK\033[0m %s\n", message); \
-  else \
+  else {\
     fprintf(stderr, "\033[1m\033[31mEE %s\033[0m\n", message); \
-  if(!(cond)) \
     exit(EXIT_FAILURE); \
+  }\
 } while(0)
