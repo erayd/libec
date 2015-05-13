@@ -44,6 +44,8 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
  * Destroy a certificate
  */
 void ec_cert_destroy(ec_cert_t *c) {
+  if(c->sk)
+    memset(c->sk, 0, crypto_sign_SECRETKEYBYTES);
   talloc_free(c);
 }
 
