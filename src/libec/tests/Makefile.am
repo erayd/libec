@@ -19,7 +19,8 @@ TESTS_TARGETS = cert \
 		ctx \
 		cert_chain \
 		role \
-		export
+		export \
+		channel
 
 check_PROGRAMS = $(TESTS_TARGETS)
 
@@ -42,3 +43,6 @@ role_LDADD = $(TESTS_LDADD)
 
 export_SOURCES = $(TESTS_SOURCES) test_export.c
 export_LDADD = $(TESTS_LDADD)
+
+channel_SOURCES = $(TESTS_SOURCES) test_channel.c
+channel_LDADD = $(TESTS_LDADD)

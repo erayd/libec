@@ -16,7 +16,6 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #include <include/common.h>
 #include <talloc.h>
-#include <sodium.h>
 #include <string.h>
 #include <time.h>
 

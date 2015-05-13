@@ -41,6 +41,8 @@ char *ec_errstr(ec_err_t error) {
     case EC_ETYPE: return "Invalid type";
     case EC_ESODIUM: return "Error in libsodium";
     case EC_EVALIDITY: return "Bad validity period";
+    case EC_EINIT: return "Not initialised";
+    case EC_EMAC: return "Bad MAC";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

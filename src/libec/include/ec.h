@@ -19,6 +19,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #include <stdint.h>
 #include <time.h>
+#include <sodium.h>
 
 //libec error codes. For a string description, use ec_errstr().
 typedef int ec_err_t;
@@ -45,6 +46,8 @@ char *ec_errstr(ec_err_t error);
 #define EC_ETYPE 18 /*invalid type*/
 #define EC_ESODIUM 19 /*libsodium error*/
 #define EC_EVALIDITY 20 /*bad validity period*/
+#define EC_EINIT 21 /*not initialised*/
+#define EC_EMAC 22 /*failed mac*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
@@ -86,11 +89,14 @@ char *ec_errstr(ec_err_t error);
 
 //various constants
 #define EC_CERT_ID_BYTES 32
+#define EC_CHANNEL_DH_BYTES (EC_CERT_ID_BYTES + crypto_box_PUBLICKEYBYTES \
+  + crypto_box_NONCEBYTES + crypto_sign_BYTES)
 
 //basic types
 typedef struct ec_ctx_t ec_ctx_t;
 typedef struct ec_cert_t ec_cert_t;
 typedef struct ec_record_t ec_record_t;
+typedef struct ec_channel_t ec_channel_t;
 typedef unsigned char *ec_id_t;
 typedef ec_cert_t *(*ec_autoload_t)(ec_id_t id);
 
@@ -210,6 +216,22 @@ char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags);
 //import a cert from base64
 ec_cert_t *ec_import_64(char *src, size_t length);
 
+
+
+//initialise a channel
+ec_err_t ec_channel_init(ec_ctx_t *ctx, ec_channel_t *ch, ec_cert_t *c, unsigned char *dh);
+
+//make a channel ready for use (second half of D/H)
+ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh);
+
+//encrypt a buffer
+ec_err_t ec_channel_encrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
+  unsigned char *mac, uint64_t *ctr);
+
+//decrypt a buffer
+ec_err_t ec_channel_decrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
+  unsigned char *mac, uint64_t ctr);
+
 /* +++++++++++++++ EXPORTED DATA LAYOUT V2 +++++++++++++++
    
    Exported trust chain certificates are appended in order of ascending
@@ -265,6 +287,21 @@ struct ec_record_t {
   uint16_t flags;
   uint16_t data_len;
   uint8_t key_len;
+};
+
+struct ec_channel_t {
+  ec_ctx_t *ctx;
+  ec_cert_t *c;
+  unsigned char pk[crypto_box_PUBLICKEYBYTES];
+  unsigned char sk[crypto_box_SECRETKEYBYTES];
+  unsigned char key[crypto_box_BEFORENMBYTES];
+  unsigned char nonce_local[crypto_box_NONCEBYTES];
+  unsigned char nonce_remote[crypto_box_NONCEBYTES];
+  uint64_t ctr;
+  enum {
+    START,
+    READY
+  } state;
 };
 
 #endif

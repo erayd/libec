@@ -27,6 +27,7 @@
 /src/config.h
 /src/libec/tests/cert
 /src/libec/tests/cert_chain
+/src/libec/tests/channel
 /src/libec/tests/ctx
 /src/libec/tests/export
 /src/libec/tests/role

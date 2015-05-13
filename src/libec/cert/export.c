@@ -17,7 +17,6 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <include/common.h>
 #include <string.h>
 #include <talloc.h>
-#include <sodium.h>
 
 #define EC_EXPORT_LINE 72
 

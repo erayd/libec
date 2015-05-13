@@ -38,4 +38,5 @@ libec_la_SOURCES = config.h \
                    cert/cert.c \
                    cert/export.c \
                    cert/record.c \
-                   cert/role.c
+                   cert/role.c \
+                   channel/channel.c
