@@ -52,11 +52,13 @@ ec_err_t ec_channel_init(ec_ctx_t *ctx, ec_channel_t *ch, ec_cert_t *c, unsigned
 /**
  * Make channel ready for use (second half of D/H)
  */
-ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh) {
+ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh, int checks) {
+  checks |= (EC_CHECK_CERT | EC_CHECK_SIGN);
+
   //fetch & verify remote cert, verify dh frame signature
   ec_cert_t *c = ec_ctx_cert(ch->ctx, dh);
-  if(!c || ec_cert_check(ch->ctx, c, EC_CHECK_ALL))
-    return EC_ECHAIN;
+  if(!c || ec_cert_check(ch->ctx, c, checks))
+    return EC_ECHECK;
   const unsigned char *sig = dh + EC_CHANNEL_DH_BYTES - crypto_sign_BYTES;
   if(crypto_sign_verify_detached(sig, dh, sig - dh, c->pk))
     return EC_ESIGN;

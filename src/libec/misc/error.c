@@ -43,6 +43,7 @@ char *ec_errstr(ec_err_t error) {
     case EC_EVALIDITY: return "Bad validity period";
     case EC_EINIT: return "Not initialised";
     case EC_EMAC: return "Bad MAC";
+    case EC_ECHECK: return "Did not pass checks";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

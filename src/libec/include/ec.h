@@ -48,6 +48,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_EVALIDITY 20 /*bad validity period*/
 #define EC_EINIT 21 /*not initialised*/
 #define EC_EMAC 22 /*failed mac*/
+#define EC_ECHECK 23 /*faild checks*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
@@ -222,7 +223,7 @@ ec_cert_t *ec_import_64(char *src, size_t length);
 ec_err_t ec_channel_init(ec_ctx_t *ctx, ec_channel_t *ch, ec_cert_t *c, unsigned char *dh);
 
 //make a channel ready for use (second half of D/H)
-ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh);
+ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh, int checks);
 
 //encrypt a buffer
 ec_err_t ec_channel_encrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
