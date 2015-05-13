@@ -21,7 +21,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 /**
  * Initialise channel
  */
-ec_err_t ec_channel_init(ec_ctx_t *ctx, ec_channel_t *ch, ec_cert_t *c, unsigned char *dh) {
+ec_err_t ec_channel_init(ec_channel_t *ch, ec_cert_t *c, ec_ctx_t *ctx, unsigned char *dh) {
   //reset state & generate new keypair
   crypto_box_keypair(ch->pk, ch->sk);
   ch->state = START;

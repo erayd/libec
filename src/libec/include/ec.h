@@ -220,7 +220,7 @@ ec_cert_t *ec_import_64(char *src, size_t length);
 
 
 //initialise a channel
-ec_err_t ec_channel_init(ec_ctx_t *ctx, ec_channel_t *ch, ec_cert_t *c, unsigned char *dh);
+ec_err_t ec_channel_init(ec_channel_t *ch, ec_cert_t *c, ec_ctx_t *ctx, unsigned char *dh);
 
 //make a channel ready for use (second half of D/H)
 ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh, int checks);
