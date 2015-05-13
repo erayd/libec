@@ -90,6 +90,7 @@ char *ec_errstr(ec_err_t error);
 
 //various constants
 #define EC_CERT_ID_BYTES 32
+#define EC_CHANNEL_MAC_BYTES crypto_box_MACBYTES
 #define EC_CHANNEL_DH_BYTES (EC_CERT_ID_BYTES + crypto_box_PUBLICKEYBYTES \
   + crypto_box_NONCEBYTES + crypto_sign_BYTES)
 
