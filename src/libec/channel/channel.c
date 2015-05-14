@@ -71,6 +71,7 @@ ec_err_t ec_channel_start(ec_channel_t *ch, unsigned char *dh, int checks) {
     return EC_ESODIUM;
 
   //ready to go :-)
+  ch->remote = c;
   ch->state = READY;
   return EC_OK;
 }
@@ -119,4 +120,11 @@ ec_err_t ec_channel_decrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
   memcpy(ch->nonce_remote, &ctr, sizeof(ctr));
 
   return EC_OK;
+}
+
+/**
+ * Get the certificate for the remote end of the channel
+ */
+ec_cert_t *ec_channel_remote(ec_channel_t *ch) {
+  return ch->remote;
 }

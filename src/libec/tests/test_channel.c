@@ -49,6 +49,10 @@ int main(void) {
   ec_abort(!ec_channel_start(&remote_ch, local_dh, EC_CHECK_ALL), "Finish remote D/H");
   ec_abort(!memcmp(local_ch.key, remote_ch.key, crypto_box_BEFORENMBYTES), "Computed keys match");
 
+  //remote cert matches
+  ec_abort(!memcmp(ec_cert_id(remote), ec_cert_id(ec_channel_remote(&local_ch)),
+      EC_CERT_ID_BYTES), "Remote certificate matches");
+
   //crypto tests
   unsigned char buf[1000];
   unsigned char buf_cmp[sizeof(buf)];

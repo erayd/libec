@@ -234,6 +234,9 @@ ec_err_t ec_channel_encrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
 ec_err_t ec_channel_decrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
   unsigned char *mac, uint64_t ctr);
 
+//get the remote cert
+ec_cert_t *ec_channel_remote(ec_channel_t *ch);
+
 /* +++++++++++++++ EXPORTED DATA LAYOUT V2 +++++++++++++++
    
    Exported trust chain certificates are appended in order of ascending
@@ -294,6 +297,7 @@ struct ec_record_t {
 struct ec_channel_t {
   ec_ctx_t *ctx;
   ec_cert_t *c;
+  ec_cert_t *remote;
   unsigned char pk[crypto_box_PUBLICKEYBYTES];
   unsigned char sk[crypto_box_SECRETKEYBYTES];
   unsigned char key[crypto_box_BEFORENMBYTES];
