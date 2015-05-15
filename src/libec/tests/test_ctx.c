@@ -28,6 +28,8 @@ ec_cert_t *autoload(ec_id_t id) {
  * Test contexts
  */
 int main(void) {
+  ec_abort(!ec_init(), "Initialise library");
+
   ec_ctx_t *ctx = ec_ctx_create();
   ec_abort(ctx, "Create context");
 

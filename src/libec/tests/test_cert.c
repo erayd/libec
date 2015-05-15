@@ -21,6 +21,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Test basic certificate functionality
  */
 int main(void) {
+  ec_abort(!ec_init(), "Initialise library");
+
   //basic functionality
   ec_cert_t *c = ec_cert_create(0, 0);
   ec_abort(c, "Create certificate");

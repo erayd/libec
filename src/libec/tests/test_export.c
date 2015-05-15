@@ -20,6 +20,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Test export & import
  */
 int main(void) {
+  ec_abort(!ec_init(), "Initialise library");
+
   ec_ctx_t *ctx = ec_ctx_create();
   ec_abort(ctx, "Create context");
   ec_cert_t *ca = ec_ctx_save(ctx, ec_cert_create(0, 0));

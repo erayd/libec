@@ -20,6 +20,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Test roles & grants
  */
 int main(void) {
+  ec_abort(!ec_init(), "Initialise library");
+
   //create context, ca & int cert
   ec_ctx_t *ctx = ec_ctx_create();
   ec_abort(ctx, "Create context");
