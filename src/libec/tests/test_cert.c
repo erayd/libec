@@ -27,6 +27,12 @@ int main(void) {
   ec_cert_t *c = ec_cert_create(0, 0);
   ec_abort(c, "Create certificate");
   c->flags |= EC_CERT_TRUSTED;
+  ec_abort(!ec_cert_lock(c, "test_password"), "Lock certificate");
+  ec_abort(ec_cert_sign(c, c) == EC_ELOCKED, "Certificate is locked");
+  ec_abort(!ec_cert_unlock(c, "bad_password"), "Unlock certificate with bad password");
+  ec_abort(ec_cert_sign(c, c) == EC_ESIGN, "Signing attempt fails with EC_ESIGN");
+  ec_abort(!ec_cert_lock(c, "bad_password"), "Re-lock certificate with bad password");
+  ec_abort(!ec_cert_unlock(c, "test_password"), "Unlock certificate with correct password");
   ec_abort(!ec_cert_sign(c, c), "Self-sign cert");
   ec_abort(!ec_cert_check(NULL, c, EC_CHECK_CERT | EC_CHECK_SECRET | EC_CHECK_SIGN),
     "Cert passes local checks");

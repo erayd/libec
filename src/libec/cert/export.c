@@ -39,7 +39,8 @@ uint16_t ec_export_len(ec_cert_t *c, uint8_t export_flags) {
     + crypto_sign_PUBLICKEYBYTES //pk
     + (c->signer_id ? EC_CERT_ID_BYTES : 0) //signer id
     + (c->signature ? crypto_sign_BYTES : 0) //signature
-    + ((c->sk && (export_flags & EC_EXPORT_SECRET)) ? crypto_sign_SECRETKEYBYTES : 0) //sk
+    + ((c->sk && c->salt && (export_flags & EC_EXPORT_SECRET))
+      ? crypto_sign_SECRETKEYBYTES + crypto_pwhash_scryptsalsa208sha256_SALTBYTES : 0) //sk & salt
     + sizeof(uint8_t); //NULL terminator
   for(ec_record_t *r = c->records; r; r = r->next)
     length += ec_record_len(r); //records
@@ -75,9 +76,11 @@ size_t ec_export(unsigned char *dest, ec_cert_t *c, uint8_t export_flags) {
     memcpy(dest, c->signature, crypto_sign_BYTES);
     dest += crypto_sign_BYTES;
   }
-  if(c->sk && (export_flags & EC_EXPORT_SECRET)) {
+  if(c->sk && c->salt && (export_flags & EC_EXPORT_SECRET)) {
     memcpy(dest, c->sk, crypto_sign_SECRETKEYBYTES);
     dest += crypto_sign_SECRETKEYBYTES;
+    memcpy(dest, c->salt, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
+    dest += crypto_pwhash_scryptsalsa208sha256_SALTBYTES;
   }
   for(ec_record_t *r = c->records; r; r = r->next) {
     uint16_t length = ec_record_len(r);
@@ -147,8 +150,10 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
 
   //sk
   if(export_flags & EC_EXPORT_SECRET) {
-    if(length < crypto_sign_SECRETKEYBYTES ||
-      !(c->sk = talloc_memdup(c, bite(crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES)))
+    if(length < crypto_sign_SECRETKEYBYTES + crypto_pwhash_scryptsalsa208sha256_SALTBYTES ||
+      !(c->sk = talloc_memdup(c, bite(crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES)) ||
+      !(c->salt = talloc_memdup(c, bite(crypto_pwhash_scryptsalsa208sha256_SALTBYTES),
+        crypto_pwhash_scryptsalsa208sha256_SALTBYTES)))
       return NULL;
   }
 

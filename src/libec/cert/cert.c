@@ -19,6 +19,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 #include <time.h>
 
+static ec_err_t ec_cert_cryptsk_toggle(ec_cert_t *c, char *password);
+
 /**
  * Create a new certificate
  */
@@ -28,10 +30,12 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
     ec_err_r(ENOMEM, NULL, NULL);
   c->pk = talloc_size(c, crypto_sign_PUBLICKEYBYTES);
   c->sk = talloc_size(c, crypto_sign_SECRETKEYBYTES);
-  if(!c->pk || !c->sk) {
+  c->salt = talloc_size(c, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
+  if(!c->pk || !c->sk || !c->salt) {
     talloc_free(c);
     return NULL;
   }
+  randombytes_buf(c->salt, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
   crypto_sign_ed25519_keypair(c->pk, c->sk);
   c->valid_from = valid_from ?: time(NULL);
   c->valid_until = valid_until ?: ~0LL;
@@ -92,6 +96,8 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
   //check signer & cert for basic validity
   rfail(ec_cert_check(NULL, c, EC_CHECK_CERT));
   rfail(ec_cert_check(NULL, signer, EC_CHECK_CERT | EC_CHECK_SECRET));
+  if(signer->flags & EC_CERT_CRYPTSK)
+    return EC_ELOCKED;
 
   //clamp validity period
   if(c->valid_from > signer->valid_from)
@@ -267,4 +273,42 @@ ec_id_t ec_cert_id(ec_cert_t *c) {
  */
 ec_record_t *ec_cert_records(ec_cert_t *c) {
   return c->records;
+}
+
+/**
+ * Toggle secret key encryption
+ */
+static ec_err_t ec_cert_cryptsk_toggle(ec_cert_t *c, char *password) {
+  if(!c->sk)
+    return EC_ENOSK;
+  if(!c->salt)
+    return EC_ENOSALT;
+  unsigned char key[crypto_sign_SECRETKEYBYTES];
+  if(crypto_pwhash_scryptsalsa208sha256(key, sizeof(key), password, strlen(password), c->salt,
+      crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_INTERACTIVE,
+      crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_INTERACTIVE))
+    return EC_ENOMEM;
+  for(int i = 0; i < sizeof(key); i++)
+    c->sk[i] ^= key[i];
+  memset(key, 0, sizeof(key));
+  c->flags ^= EC_CERT_CRYPTSK;
+  return EC_OK;
+}
+
+/**
+ * Encrypt a secret key
+ */
+ec_err_t ec_cert_lock(ec_cert_t *c, char *password) {
+  if(c->flags & EC_CERT_CRYPTSK)
+    return EC_ELOCKED;
+  return ec_cert_cryptsk_toggle(c, password);
+}
+
+/**
+ * Decrypt a secret key
+ */
+ec_err_t ec_cert_unlock(ec_cert_t *c, char *password) {
+  if(!(c->flags & EC_CERT_CRYPTSK))
+    return EC_OK; //not locked
+  return ec_cert_cryptsk_toggle(c, password);
 }

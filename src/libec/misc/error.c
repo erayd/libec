@@ -44,6 +44,8 @@ char *ec_errstr(ec_err_t error) {
     case EC_EINIT: return "Not initialised";
     case EC_EMAC: return "Bad MAC";
     case EC_ECHECK: return "Did not pass checks";
+    case EC_ELOCKED: return "Certificate locked";
+    case EC_ENOSALT: return "No salt";
     case EC_EUNKNOWN:
     default: return "Unknown error";
   }

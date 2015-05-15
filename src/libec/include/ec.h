@@ -49,6 +49,8 @@ char *ec_errstr(ec_err_t error);
 #define EC_EINIT 21 /*not initialised*/
 #define EC_EMAC 22 /*failed mac*/
 #define EC_ECHECK 23 /*faild checks*/
+#define EC_ELOCKED 24 /*certificate is locked*/
+#define EC_ENOSALT 25 /*no salt*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
@@ -128,6 +130,11 @@ ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);
 //get certificate from context store
 ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 
+//encrypt a secret key
+ec_err_t ec_cert_lock(ec_cert_t *c, char *password);
+
+//decrypt a secret key
+ec_err_t ec_cert_unlock(ec_cert_t *c, char *password);
 
 
 //create a new certificate
@@ -279,6 +286,7 @@ struct ec_cert_t {
   unsigned char *pk;
   unsigned char *signature;
   unsigned char *sk;
+  unsigned char *salt;
   uint32_t valid_from;
   uint32_t valid_until;
   uint8_t version;
