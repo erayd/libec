@@ -130,11 +130,6 @@ ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);
 //get certificate from context store
 ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 
-//encrypt a secret key
-ec_err_t ec_cert_lock(ec_cert_t *c, char *password);
-
-//decrypt a secret key
-ec_err_t ec_cert_unlock(ec_cert_t *c, char *password);
 
 
 //create a new certificate
@@ -155,6 +150,11 @@ ec_id_t ec_cert_id(ec_cert_t *c);
 //get the record list for a certificate
 ec_record_t *ec_cert_records(ec_cert_t *c);
 
+//encrypt a secret key
+ec_err_t ec_cert_lock(ec_cert_t *c, char *password);
+
+//decrypt a secret key
+ec_err_t ec_cert_unlock(ec_cert_t *c, char *password);
 
 
 //create a new record with binary key & data - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
