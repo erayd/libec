@@ -27,3 +27,10 @@ ec_err_t ec_init(void) {
     return EC_ESODIUM;
   return EC_OK;
 }
+
+/**
+ * Return the current libec version
+ */
+char *ec_version(void) {
+  return VERSION;
+}

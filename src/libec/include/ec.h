@@ -110,6 +110,9 @@ typedef ec_cert_t *(*ec_autoload_t)(ec_id_t id);
 //nitialise library - must be called before any other function
 ec_err_t ec_init(void);
 
+//return library version
+char *ec_version(void);
+
 
 
 //create a new context
