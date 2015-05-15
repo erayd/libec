@@ -17,7 +17,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #ifndef EC_COMMON_H
 #define EC_COMMON_H
 
-#include <config.h>
+#include <../config.h>
 #include <include/ec.h>
 #include <stdio.h>
 #include <stdlib.h>
