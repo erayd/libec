@@ -21,6 +21,21 @@ LT_INIT
 AM_INIT_AUTOMAKE([1.11 dist-bzip2 tar-ustar foreign subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+AC_SUBST([EC_LIBTOOL_VERSION], [1:0:0])
+#                               | | |
+#                         +-----+ | +----+
+#                         |       |      |
+#                      current:revision:age
+#                         |       |      |
+#                         |       |      +-- Increment if interfaces have been added, or set to
+#                         |       |          zero if interfaces have been removed or changed.
+#                         |       |
+#                         |       +----------Increment if source has changed, or set to zero if
+#                         |                  current has been incremented.
+#                         |
+#                         +------------------Increment if interfaces have been added, changed, or
+#                                            removed.
+
 # Features
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging]), [], [enable_debug=no])
 AS_IF([test "x$enable_debug" != xno], [
