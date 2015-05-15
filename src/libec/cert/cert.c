@@ -55,7 +55,7 @@ ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c) {
     return EC_ENOPK;
 
   //pre-process fields
-  uint8_t sign_flags = c->flags & ~EC_CERT_TRUSTED;
+  uint8_t sign_flags = c->flags & ~EC_CERT_CRYPTSK;
 
   //generate hash
   crypto_generichash_state state;

@@ -52,6 +52,7 @@ char *ec_errstr(ec_err_t error);
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
+#define EC_CERT_CRYPTSK (1 << 1) /*secret is encrypted*/
 
 #define EC_RECORD_SECTION (1 << 0) /*record is a section header*/
 #define EC_RECORD_REQUIRE (1 << 1) /*client *must* understand record / section*/
