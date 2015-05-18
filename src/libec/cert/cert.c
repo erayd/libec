@@ -312,3 +312,17 @@ ec_err_t ec_cert_unlock(ec_cert_t *c, char *password) {
     return EC_OK; //not locked
   return ec_cert_cryptsk_toggle(c, password);
 }
+
+/**
+ * Copy a certificate
+ */
+ec_cert_t *ec_cert_copy(ec_cert_t *c) {
+  // Abuse the export / import functions for the sake of maintainability. Slight
+  // overhead from extra checks etc. involved with export / import, but obviates
+  // the need for yet another certificate-construction implementation, and makes
+  // copying simple.
+  unsigned char buf[ec_export_len(c, EC_EXPORT_SECRET)];
+  if(!ec_export(buf, c, EC_EXPORT_SECRET))
+    return NULL;
+  return ec_import(buf, sizeof(buf));
+}

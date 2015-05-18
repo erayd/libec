@@ -138,6 +138,9 @@ ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 //create a new certificate
 ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until);
 
+//copy a certificate
+ec_cert_t *ec_cert_copy(ec_cert_t *c);
+
 //destroy a certificate
 void ec_cert_destroy(ec_cert_t *c);
 
