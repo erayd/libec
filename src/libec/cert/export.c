@@ -259,12 +259,18 @@ ec_cert_t *ec_import_64(char *src, size_t length) {
     if(!in_cert && !strcmp(line, EC_EXPORT_BEGIN))
       in_cert = 1;
     else if(in_cert) {
-      if(!strcmp(line, EC_EXPORT_END))
+      if(!strcmp(line, EC_EXPORT_END)) {
+        in_cert = 0;
         break;
+      }
       ec_base64_decode(pos, line, strlen(line));
       pos += binary_line;
     }
   }
+
+  //no ending block found
+  if(in_cert)
+    return NULL;
 
   return ec_import(buf, sizeof(buf));
 }
