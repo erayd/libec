@@ -141,6 +141,10 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
   if(flags & EC_CHECK_CHAIN)
     flags |= EC_CHECK_SIGN;
 
+  //some checks require a context
+  if((flags & (EC_CHECK_CHAIN | EC_CHECK_ROLE)) && !ctx)
+    return EC_ENOCTX;
+
   //basic checks
   if(flags & EC_CHECK_CERT) {
     //version is EC_LAYOUT_VERSION
