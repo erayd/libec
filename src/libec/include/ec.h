@@ -275,6 +275,7 @@ ec_cert_t *ec_channel_remote(ec_channel_t *ch);
     32B (optional) ed25519 signer id
     64B (optional) ed25519 signature (signed blake2b 512bit hash)
     64B (optional) ed25519 secret key
+    32B (optional) salt for password-encryption of secret key
     <records>
     1B (required) NULL byte
 
