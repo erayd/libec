@@ -24,6 +24,11 @@ ec_cert_t *autoload(ec_id_t id) {
   return NULL;
 }
 
+int validate = 0;
+int validator(ec_ctx_t *ctx, ec_cert_t *c, ec_record_t *r) {
+  return validate;
+}
+
 /**
  * Test contexts
  */
@@ -60,6 +65,13 @@ int main(void) {
   c_al = ec_cert_create(0, 0);
   ec_abort(c_al, "Create autoload certificate");
   ec_abort(c_al == ec_ctx_cert(chain, ec_cert_id(c_al)), "Retrieve correct certificate via autoload");
+
+  //validator
+  ec_abort(ec_add(c, "_test", ec_record(EC_RECORD_REQUIRE, "testRecord", NULL, 0)), "Add test record");
+  ec_ctx_validator(ctx, validator);
+  ec_abort(!ec_cert_check(ctx, c, EC_CHECK_REQUIRE), "Required record passes validation");
+  validate = 1;
+  ec_abort(ec_cert_check(ctx, c, EC_CHECK_REQUIRE) == EC_EREQUIRED, "Required record fails validation");
 
   //cleanup
   ec_ctx_destroy(chain);

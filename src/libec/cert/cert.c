@@ -142,7 +142,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     flags |= EC_CHECK_SIGN;
 
   //some checks require a context
-  if((flags & (EC_CHECK_CHAIN | EC_CHECK_ROLE)) && !ctx)
+  if((flags & (EC_CHECK_CHAIN | EC_CHECK_ROLE | EC_CHECK_REQUIRE)) && !ctx)
     return EC_ENOCTX;
 
   //basic checks
@@ -257,6 +257,25 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
       //roles must be granted by the signer unless the cert is a trusted root
       if(!(c->flags & EC_CERT_TRUSTED) && ec_role_has_grant(signer, (char*)r->key))
         return EC_EGRANT;
+    }
+  }
+
+  //required records
+  if(flags & EC_CHECK_REQUIRE) {
+    //a validation function must be set
+    if(!ctx->validator)
+      return EC_ENOVALIDATOR;
+
+    //iterate records
+    for(ec_record_t *r = c->records; r; r = r->next) {
+
+      //don't check non-required records
+      if(!(r->flags & EC_RECORD_REQUIRE))
+        continue;
+
+      //record must validate
+      if(ctx->validator(ctx, c, r))
+        return EC_EREQUIRED;
     }
   }
 

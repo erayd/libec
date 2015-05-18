@@ -45,8 +45,8 @@ int main(void) {
   ec_channel_t remote_ch;
   unsigned char remote_dh[EC_CHANNEL_DH_BYTES];
   ec_abort(!ec_channel_init(&remote_ch, remote, ctx, remote_dh), "Initialise remote channel");
-  ec_abort(!ec_channel_start(&local_ch, remote_dh, EC_CHECK_ALL), "Finish local D/H");
-  ec_abort(!ec_channel_start(&remote_ch, local_dh, EC_CHECK_ALL), "Finish remote D/H");
+  ec_abort(!ec_channel_start(&local_ch, remote_dh, EC_CHECK_ALL & ~EC_CHECK_REQUIRE), "Finish local D/H");
+  ec_abort(!ec_channel_start(&remote_ch, local_dh, EC_CHECK_ALL & ~EC_CHECK_REQUIRE), "Finish remote D/H");
   ec_abort(!memcmp(local_ch.key, remote_ch.key, crypto_box_BEFORENMBYTES), "Computed keys match");
 
   //remote cert matches

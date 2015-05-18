@@ -54,6 +54,14 @@ void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload) {
   ctx->autoload = autoload;
 }
 
+
+/**
+ * Set validator
+ */
+void ec_ctx_validator(ec_ctx_t *ctx, ec_record_validator_t validator) {
+  ctx->validator = validator;
+}
+
 /**
  * Set next context
  */

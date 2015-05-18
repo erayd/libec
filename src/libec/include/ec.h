@@ -52,6 +52,8 @@ char *ec_errstr(ec_err_t error);
 #define EC_ELOCKED 24 /*certificate is locked*/
 #define EC_ENOSALT 25 /*no salt*/
 #define EC_ENOCTX 26 /*no context*/
+#define EC_ENOVALIDATOR 27 /*no validator*/
+#define EC_EREQUIRED 28 /*required record does not validate*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
@@ -71,6 +73,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_CHECK_SECRET (1 << 2) /*secret key is present*/
 #define EC_CHECK_CHAIN (1 << 3) /*check trust chain*/
 #define EC_CHECK_ROLE (1 << 4) /*check roles & grants*/
+#define EC_CHECK_REQUIRE (1 << 5) /*check required records*/
 #define EC_CHECK_ALL (~EC_CHECK_SECRET) /*all checks except SECRET*/
 
 #define EC_EXPORT_SECRET (1 << 0) /*include secret key in exported cert*/
@@ -105,6 +108,7 @@ typedef struct ec_record_t ec_record_t;
 typedef struct ec_channel_t ec_channel_t;
 typedef unsigned char *ec_id_t;
 typedef ec_cert_t *(*ec_autoload_t)(ec_id_t id);
+typedef int (*ec_record_validator_t)(ec_ctx_t *ctx, ec_cert_t *c, ec_record_t *r);
 
 
 
@@ -124,6 +128,9 @@ void ec_ctx_destroy(ec_ctx_t *ctx);
 
 //set certificate autoloader
 void ec_ctx_autoload(ec_ctx_t *ctx, ec_autoload_t autoload);
+
+//set record validator
+void ec_ctx_validator(ec_ctx_t *ctx, ec_record_validator_t validator);
 
 //sets the next context to search
 ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next);
@@ -284,6 +291,7 @@ ec_cert_t *ec_channel_remote(ec_channel_t *ch);
 struct ec_ctx_t {
   ec_ctx_t *next;
   ec_autoload_t autoload;
+  ec_record_validator_t validator;
   struct ec_sl_t *certs;
 };
 
