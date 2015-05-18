@@ -97,7 +97,9 @@ size_t ec_export(unsigned char *dest, ec_cert_t *c, uint8_t export_flags) {
 /**
  * Import cert from buffer
  */
-ec_cert_t *ec_import(unsigned char *src, size_t length) {
+ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
+  if(consumed)
+    *consumed = length;
   unsigned char *bite(size_t bytes) {
     unsigned char *p = src;
     length -= bytes;
@@ -185,6 +187,8 @@ ec_cert_t *ec_import(unsigned char *src, size_t length) {
     return NULL;
   }
 
+  if(consumed)
+    *consumed -= length;
   return c;
 }
 
@@ -231,7 +235,7 @@ char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags) {
 /**
  * Import a cert from base64
  */
-ec_cert_t *ec_import_64(char *src, size_t length) {
+ec_cert_t *ec_import_64(char *src, size_t length, size_t *consumed) {
   const int binary_line = EC_EXPORT_LINE * 3 / 4;
 
   //basic sanity check on length
@@ -255,7 +259,11 @@ ec_cert_t *ec_import_64(char *src, size_t length) {
   int in_cert = 0;
 
   //find certificate portion of text and decode into buf
+  if(consumed)
+    *consumed = 0;
   for(char *line = sbuf; line - sbuf < length; line += strlent(line)) {
+    if(consumed)
+      *consumed += strlent(line);
     if(!in_cert && !strcmp(line, EC_EXPORT_BEGIN))
       in_cert = 1;
     else if(in_cert) {
@@ -272,5 +280,5 @@ ec_cert_t *ec_import_64(char *src, size_t length) {
   if(in_cert)
     return NULL;
 
-  return ec_import(buf, sizeof(buf));
+  return ec_import(buf, sizeof(buf), NULL);
 }

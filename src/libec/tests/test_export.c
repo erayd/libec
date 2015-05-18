@@ -40,7 +40,8 @@ int main(void) {
   memcpy(secret, c->sk, sizeof(secret));
   ec_abort(!ec_cert_lock(c, "test_password"), "Lock certificate");
   ec_abort(ec_export_64(buf, c, EC_EXPORT_SECRET), "Export cert");
-  ec_abort(c = ec_ctx_save(ctx, ec_import_64(buf, sizeof(buf))), "Import cert");
+  size_t consumed;
+  ec_abort(c = ec_ctx_save(ctx, ec_import_64(buf, sizeof(buf), &consumed)), "Import cert");
   ec_abort(!ec_cert_unlock(c, "test_password"), "Unlock certificate");
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_ALL | EC_CHECK_SECRET), "Cert passes all checks");
   ec_abort(!memcmp(secret, c->sk, sizeof(secret)), "Secret key matches");

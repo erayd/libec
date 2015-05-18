@@ -324,5 +324,5 @@ ec_cert_t *ec_cert_copy(ec_cert_t *c) {
   unsigned char buf[ec_export_len(c, EC_EXPORT_SECRET)];
   if(!ec_export(buf, c, EC_EXPORT_SECRET))
     return NULL;
-  return ec_import(buf, sizeof(buf));
+  return ec_import(buf, sizeof(buf), NULL);
 }
