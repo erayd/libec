@@ -51,6 +51,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_ECHECK 23 /*faild checks*/
 #define EC_ELOCKED 24 /*certificate is locked*/
 #define EC_ENOSALT 25 /*no salt*/
+#define EC_ENOCTX 26 /*no context*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
