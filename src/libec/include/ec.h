@@ -282,7 +282,7 @@ ec_cert_t *ec_channel_remote(ec_channel_t *ch);
 //internal structures
 struct ec_ctx_t {
   ec_ctx_t *next;
-  ec_cert_t *(*autoload)(ec_id_t id);
+  ec_autoload_t autoload;
   struct ec_sl_t *certs;
 };
 
