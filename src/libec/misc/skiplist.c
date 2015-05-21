@@ -69,6 +69,8 @@ ec_sl_cursor_t *ec_sl_cursor(ec_sl_t *l, ec_sl_cursor_t *c, void *key) {
  * Sets & returns errno on failure, otherwise returns zero
  */
 int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data) {
+  if(!data)
+    return EC_EUNDEFINED;
   //set element level
   int level = 1;
   while(level < EC_SL_MAXLEVEL && rand() % 2)
@@ -94,12 +96,14 @@ int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data) {
  * Get the element data for a given key. Returns NULL if not found.
  */
 void *ec_sl_get(ec_sl_t *l, void *key) {
+  if(!key)
+    return NULL;
   ec_sl_node_t *n = l->start;
   for(int level = l->level; level; level--) {
     while(n[level].next && (!key || l->compfn(key, n[level].next->data) >= 0))
       n = n[level].next;
   }
-  return (n->data && !l->compfn(key, n->data)) ?n->data : NULL;
+  return (n->data && !l->compfn(key, n->data)) ? n->data : NULL;
 }
 
 /**
@@ -108,6 +112,8 @@ void *ec_sl_get(ec_sl_t *l, void *key) {
  * Sets & returns errno on failure, otherwise returns zero.
  */
 int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn) {
+  if(!key || !data)
+    return EC_EUNDEFINED;
   ec_sl_cursor_t c;
   ec_sl_cursor(l, &c, key);
   if(c[1]->next && !l->compfn(key, c[1]->next->data)) {
@@ -124,6 +130,8 @@ int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn) {
  * Remove the element for a given key, if it exists
  */
 void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
+  if(!key)
+    return NULL;
   ec_sl_cursor_t c;
   ec_sl_cursor(l, &c, key);
   ec_sl_node_t *n = c[1]->next;

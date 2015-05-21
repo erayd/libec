@@ -54,6 +54,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_ENOCTX 26 /*no context*/
 #define EC_ENOVALIDATOR 27 /*no validator*/
 #define EC_EREQUIRED 28 /*required record does not validate*/
+#define EC_EUNDEFINED 29 /*undefined data*/
 
 //flags
 #define EC_CERT_TRUSTED (1 << 0) /*cert is a trust anchor*/
