@@ -19,10 +19,23 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 
 /**
+ * Zero channel state
+ */
+void ec_channel_clean(ec_channel_t *ch) {
+  sodium_munlock(ch->sk, crypto_box_SECRETKEYBYTES);
+  sodium_munlock(ch->key, crypto_box_BEFORENMBYTES);
+  sodium_memzero(ch, sizeof(*ch));
+}
+
+/**
  * Initialise channel
  */
 ec_err_t ec_channel_init(ec_channel_t *ch, ec_cert_t *c, ec_ctx_t *ctx, unsigned char *dh) {
   //reset state & generate new keypair
+  sodium_munlock(ch->sk, crypto_box_SECRETKEYBYTES);
+  sodium_mlock(ch->sk, crypto_box_SECRETKEYBYTES);
+  sodium_munlock(ch->key, crypto_box_BEFORENMBYTES);
+  sodium_mlock(ch->key, crypto_box_BEFORENMBYTES);
   crypto_box_keypair(ch->pk, ch->sk);
   ch->state = START;
   ch->ctx = ctx;

@@ -68,6 +68,8 @@ int main(void) {
 
   //cleanup
   ec_ctx_destroy(ctx);
+  ec_channel_clean(&local_ch);
+  ec_channel_clean(&remote_ch);
 
   return 0;
 }

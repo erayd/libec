@@ -241,6 +241,8 @@ char *ec_export_64(char *dest, ec_cert_t *c, uint8_t export_flags);
 ec_cert_t *ec_import_64(char *src, size_t length, size_t *consumed);
 
 
+//zero channel state
+void ec_channel_clean(ec_channel_t *ch);
 
 //initialise a channel
 ec_err_t ec_channel_init(ec_channel_t *ch, ec_cert_t *c, ec_ctx_t *ctx, unsigned char *dh);
