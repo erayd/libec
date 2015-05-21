@@ -197,6 +197,11 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     if(!c->pk)
       return EC_ENOPK;
 
+    //first record must be a section header
+    ec_record_t *s = ec_cert_records(c);
+    if(s && !(s->flags & EC_RECORD_SECTION))
+      return EC_ERECORD;
+
     //iterate records
     for(ec_record_t *r = ec_cert_records(c); r; r = r->next) {
 
