@@ -35,8 +35,8 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
     talloc_free(c);
     return NULL;
   }
-  sodium_mlock(c->sk, crypto_sign_SECRETKEYBYTES);
   randombytes_buf(c->salt, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
+  sodium_mlock(c->sk, crypto_sign_SECRETKEYBYTES);
   crypto_sign_ed25519_keypair(c->pk, c->sk);
   c->valid_from = valid_from ?: time(NULL);
   c->valid_until = valid_until ?: ~0LL;
