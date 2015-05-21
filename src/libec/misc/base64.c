@@ -61,7 +61,12 @@ size_t ec_base64_encode(char *dest, unsigned char *src, size_t length) {
 size_t ec_base64_decode(unsigned char *dest, char *src, size_t length) {
   unsigned char table(char c) {
     const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-    return strchr(table, c) - table;
+    char *d = (char*)table;
+    for(; *d; d++) {
+      if(c == *d)
+        return d - table;
+    }
+    return 0;
   }
   unsigned char *pos = dest;
   while(length >= 4) {
