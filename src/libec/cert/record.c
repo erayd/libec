@@ -115,6 +115,7 @@ ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r) {
   s->next = r;
 
   //inherit flags from section
+  r->flags |= (s->flags & EC_RECORD_NOSIGN);
   if((s->flags | r->flags) & EC_RECORD_INHERIT)
     r->flags |= ((s->flags & ~EC_RECORD_SECTION) & 0xFF);
 
