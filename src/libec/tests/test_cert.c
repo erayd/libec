@@ -34,8 +34,13 @@ int main(void) {
   ec_abort(!ec_cert_lock(c, "bad_password"), "Re-lock certificate with bad password");
   ec_abort(!ec_cert_unlock(c, "test_password"), "Unlock certificate with correct password");
   ec_abort(!ec_cert_sign(c, c), "Self-sign cert");
+  ec_cert_strip(c, EC_STRIP_RECORD);
   ec_abort(!ec_cert_check(NULL, c, EC_CHECK_CERT | EC_CHECK_SECRET | EC_CHECK_SIGN),
     "Cert passes local checks");
+  ec_cert_strip(c, EC_STRIP_SECRET);
+  ec_abort(ec_cert_check(NULL, c, EC_CHECK_SECRET) == EC_ENOSK, "Strip secret key");
+  ec_cert_strip(c, EC_STRIP_SIGN);
+  ec_abort(ec_cert_check(NULL, c, EC_CHECK_SIGN) == EC_ESIGNER, "Strip signer & signature");
   ec_cert_destroy(c);
 
   //valid_from in future

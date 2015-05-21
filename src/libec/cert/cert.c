@@ -53,6 +53,40 @@ void ec_cert_destroy(ec_cert_t *c) {
   talloc_free(c);
 }
 
+/**
+ * Strip data from a certificate
+ */
+void ec_cert_strip(ec_cert_t *c, int what) {
+  //strip secret key
+  if(what & EC_STRIP_SECRET) {
+    sodium_munlock(c->sk, crypto_sign_SECRETKEYBYTES);
+    talloc_free(c->sk);
+    c->sk = NULL;
+  }
+
+  //strip NOSIGN records
+  if(what & EC_STRIP_RECORD) {
+    ec_record_t **ptr = &c->records;
+    ec_record_t *r = *ptr;
+    for(; r; r = *ptr) {
+      if(r->flags & EC_RECORD_NOSIGN) {
+        *ptr = r->next;
+        ec_record_destroy(r);
+      }
+      else
+        ptr = &r->next;
+    }
+  }
+
+  //strip signer & signature
+  if(what & EC_STRIP_SIGN) {
+    talloc_free(c->signer_id);
+    c->signer_id = NULL;
+    talloc_free(c->signature);
+    c->signature = NULL;
+  }
+}
+
 //hash a certificate
 ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c) {
   //check required data fields

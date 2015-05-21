@@ -76,6 +76,10 @@ char *ec_errstr(ec_err_t error);
 #define EC_CHECK_REQUIRE (1 << 5) /*check required records*/
 #define EC_CHECK_ALL (~EC_CHECK_SECRET) /*all checks except SECRET*/
 
+#define EC_STRIP_SECRET (1 << 0) /*strip secret key*/
+#define EC_STRIP_RECORD (1 << 1) /*strip NOSIGN records*/
+#define EC_STRIP_SIGN (1 << 2) /*strip signer_id & signature*/
+
 #define EC_EXPORT_SECRET (1 << 0) /*include secret key in exported cert*/
 #define EC_EXPORT_SIGNER (1 << 1) /*include signer_id in exported cert*/
 #define EC_EXPORT_SIGNATURE (1 << 2) /*include signature in exported cert*/
@@ -151,6 +155,9 @@ ec_cert_t *ec_cert_copy(ec_cert_t *c);
 
 //destroy a certificate
 void ec_cert_destroy(ec_cert_t *c);
+
+//strip data from a certificate
+void ec_cert_strip(ec_cert_t *c, int what);
 
 //sign a certificate
 ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer);
