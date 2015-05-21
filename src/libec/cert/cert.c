@@ -41,6 +41,14 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
   c->valid_from = valid_from ?: time(NULL);
   c->valid_until = valid_until ?: ~0LL;
   c->version = EC_LAYOUT_VERSION;
+
+  //clean up on talloc free
+  int talloc_destructor(void *ptr) {
+    ec_cert_destroy(ptr);
+    return 0;
+  }
+  talloc_set_destructor(c, talloc_destructor);
+
   return c;
 }
 
