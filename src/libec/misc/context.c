@@ -36,6 +36,14 @@ ec_ctx_t *ec_ctx_create(void) {
   if(!ctx)
     ec_err_r(ENOMEM, NULL, NULL);
   ctx->certs = ec_sl_create(_compfn);
+
+  //clean up on talloc free
+  int talloc_destructor(void *ptr) {
+    ec_ctx_destroy(ptr);
+    return 0;
+  }
+  talloc_set_destructor(ctx, talloc_destructor);
+
   return ctx;
 }
 
@@ -44,6 +52,7 @@ ec_ctx_t *ec_ctx_create(void) {
  */
 void ec_ctx_destroy(ec_ctx_t *ctx) {
   ec_sl_destroy(ctx->certs, (ec_sl_freefn_t)ec_cert_destroy);
+  talloc_set_destructor(ctx, NULL); //don't call destructor twice
   talloc_free(ctx);
 }
 

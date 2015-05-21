@@ -58,6 +58,7 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
 void ec_cert_destroy(ec_cert_t *c) {
   if(c->sk)
     sodium_munlock(c->sk, crypto_sign_SECRETKEYBYTES);
+  talloc_set_destructor(c, NULL); //don't call the destructor twice
   talloc_free(c);
 }
 
