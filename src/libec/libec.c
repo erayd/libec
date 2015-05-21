@@ -23,6 +23,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
  * Initialise library - must be called before any other function
  */
 ec_err_t ec_init(void) {
+  srand(time(NULL)); //*NOT* used for cryptography, it's just level-selection
+                     //for skiplists.
   if(sodium_init() == -1)
     return EC_ESODIUM;
   return EC_OK;
