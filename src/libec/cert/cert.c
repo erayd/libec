@@ -203,14 +203,24 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
       return EC_ERECORD;
 
     //iterate records
-    for(ec_record_t *r = ec_cert_records(c); r; r = r->next) {
+    for(ec_record_t *r = s; r; r = r->next) {
 
       //records are the correct length
       if(r->key_len > EC_RECORD_KMAX || r->data_len > EC_RECORD_DMAX)
         return EC_ERECORD;
 
-      //section start records have a valid string key
-      if((r->flags & EC_RECORD_SECTION) && !isstr(r->key, r->key_len))
+      //section header checks
+      if(r->flags & EC_RECORD_SECTION) {
+        s = r; //set current section
+
+        //section header records must have a valid string key
+        if(!isstr(r->key, r->key_len))
+          return EC_ERECORD;
+      }
+
+      //if section name begins with '$', all records in that
+      //section must be signed, including the section header
+      if(s->key[0] == '$' && (r->flags & EC_RECORD_NOSIGN))
         return EC_ERECORD;
     }
   }
