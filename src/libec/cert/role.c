@@ -49,26 +49,26 @@ static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
  * Create a new role record
  */
 ec_record_t *ec_role_add(ec_cert_t *c, char *role) {
-  return ec_add(c, "_role", ec_record(EC_RECORD_KCOPY, role, NULL, 0));
+  return ec_add(c, "$_role", ec_record(EC_RECORD_KCOPY, role, NULL, 0));
 }
 
 /**
  * Create a new grant record
  */
 ec_record_t *ec_role_grant(ec_cert_t *c, char *grant) {
-  return ec_add(c, "_grant", ec_record(EC_RECORD_KCOPY, grant, NULL, 0));
+  return ec_add(c, "$_grant", ec_record(EC_RECORD_KCOPY, grant, NULL, 0));
 }
 
 /**
  * Check whether a certificate has the specified role
  */
 ec_err_t ec_role_has(ec_cert_t *c, char *role) {
-  return ec_role_has_section(c, role, "_role");
+  return ec_role_has_section(c, role, "$_role");
 }
 
 /**
  * Check whether a certificate grants the specified role
  */
 ec_err_t ec_role_has_grant(ec_cert_t *c, char *role) {
-  return ec_role_has_section(c, role, "_grant");
+  return ec_role_has_section(c, role, "$_grant");
 }
