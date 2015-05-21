@@ -73,6 +73,10 @@ int main(void) {
   validate = 1;
   ec_abort(ec_cert_check(ctx, c, EC_CHECK_REQUIRE) == EC_EREQUIRED, "Required record fails validation");
 
+  //remove cert
+  ec_abort(ec_ctx_remove(ctx, ec_cert_id(c)), "Remove certificate from context");
+  ec_abort(!ec_ctx_cert(ctx, ec_cert_id(c)), "Certificate is no longer present in context store");
+
   //cleanup
   ec_ctx_destroy(chain);
   ec_ctx_destroy(ctx);

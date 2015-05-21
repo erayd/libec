@@ -3,6 +3,14 @@
 ##[Unreleased](https://github.com/erayd/libec/tree/dev)
 
 ###New Interfaces
+ * ec_ctx_remove()
+
+###Enhancements
+ * Add interface to remove certificate from context store
+
+##[v0.2.0-dev](https://github.com/erayd/libec/releases/tag/v0.2.0-dev)
+
+###New Interfaces
  * ec_cert_copy()
  * ec_cert_strip()
  * ec_ctx_validator()

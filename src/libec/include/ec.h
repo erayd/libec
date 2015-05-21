@@ -143,6 +143,9 @@ ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next);
 //save certificate in context store
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c);
 
+//remove certificate from context store
+ec_cert_t *ec_ctx_remove(ec_ctx_t *ctx, ec_id_t id);
+
 //get certificate from context store
 ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 

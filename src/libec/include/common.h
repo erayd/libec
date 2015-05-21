@@ -113,7 +113,7 @@ ec_sl_cursor_t *ec_sl_cursor(ec_sl_t *l, ec_sl_cursor_t *c, void *key);
 int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data);
 void *ec_sl_get(ec_sl_t *l, void *key);
 int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn);
-void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn);
+void *ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn);
 
 //base64
 #define EC_EXPORT_BEGIN "--------------------- BEGIN EXPORTED EC CERTIFICATE --------------------"

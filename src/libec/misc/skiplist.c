@@ -129,9 +129,10 @@ int ec_sl_set(ec_sl_t *l, void *key, void *data, ec_sl_freefn_t freefn) {
 /**
  * Remove the element for a given key, if it exists
  */
-void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
+void *ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
   if(!key)
-    return;
+    return NULL;
+  void *rval = NULL;
   ec_sl_cursor_t c;
   ec_sl_cursor(l, &c, key);
   ec_sl_node_t *n = c[1]->next;
@@ -140,8 +141,10 @@ void ec_sl_remove(ec_sl_t *l, void *key, ec_sl_freefn_t freefn) {
       if(c[level]->next == n)
         c[level]->next = n[level].next;
     }
+    rval = n[0].data;
     if(freefn && n[0].data)
       freefn(n[0].data);
     talloc_free(n);
   }
+  return rval;
 }

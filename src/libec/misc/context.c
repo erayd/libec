@@ -90,6 +90,17 @@ ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c) {
 }
 
 /**
+ * Remove a certificate from the context store, and return the certificate
+ * if it exists
+ */
+ec_cert_t *ec_ctx_remove(ec_ctx_t *ctx, ec_id_t id) {
+  ec_cert_t *c = ec_sl_remove(ctx->certs, id, NULL);
+  if(c)
+    talloc_reparent(ctx, NULL, c);
+  return c;
+}
+
+/**
  * Get a certificate from the context store
  */
 ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id) {
