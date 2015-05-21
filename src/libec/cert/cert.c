@@ -35,6 +35,7 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
     talloc_free(c);
     return NULL;
   }
+  sodium_mlock(c->sk, crypto_sign_SECRETKEYBYTES);
   randombytes_buf(c->salt, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
   crypto_sign_ed25519_keypair(c->pk, c->sk);
   c->valid_from = valid_from ?: time(NULL);
@@ -48,7 +49,7 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
  */
 void ec_cert_destroy(ec_cert_t *c) {
   if(c->sk)
-    memset(c->sk, 0, crypto_sign_SECRETKEYBYTES);
+    sodium_munlock(c->sk, crypto_sign_SECRETKEYBYTES);
   talloc_free(c);
 }
 
