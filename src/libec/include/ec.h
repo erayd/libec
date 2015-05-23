@@ -194,7 +194,7 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
 ec_record_t *ec_record_str(uint16_t flags, char *key, char *data);
 
 //create a new record with a string key & binary data
-ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t data_len);
+ec_record_t *ec_record_create(uint16_t flags, char *key, unsigned char *data, uint16_t data_len);
 
 //append a record to a certificate
 ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r);

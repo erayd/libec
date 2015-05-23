@@ -78,7 +78,7 @@ ec_record_t *ec_record_str(uint16_t flags, char *key, char *data) {
 /**
  * Create a new record with a string key
  */
-ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t data_len) {
+ec_record_t *ec_record_create(uint16_t flags, char *key, unsigned char *data, uint16_t data_len) {
   return ec_record_bin(flags, (unsigned char*)key, 0, data, data_len);
 }
 
@@ -102,7 +102,7 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r) {
   ec_record_t *s = ec_record_match(ec_cert_records(c), NULL, EC_RECORD_SECTION, section, NULL, 0);
   //create section if missing
   if(!s) {
-    if(!(s = ec_record(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
+    if(!(s = ec_record_create(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
       ec_err_r(ENOMEM, NULL, NULL);
     talloc_steal(c, s);
     s->next = ec_cert_records(c);

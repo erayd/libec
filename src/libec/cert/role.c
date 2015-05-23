@@ -49,14 +49,14 @@ static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
  * Create a new role record
  */
 ec_record_t *ec_role_add(ec_cert_t *c, char *role) {
-  return ec_record_add(c, "$_role", ec_record(EC_RECORD_KCOPY, role, NULL, 0));
+  return ec_record_add(c, "$_role", ec_record_create(EC_RECORD_KCOPY, role, NULL, 0));
 }
 
 /**
  * Create a new grant record
  */
 ec_record_t *ec_role_grant(ec_cert_t *c, char *grant) {
-  return ec_record_add(c, "$_grant", ec_record(EC_RECORD_KCOPY, grant, NULL, 0));
+  return ec_record_add(c, "$_grant", ec_record_create(EC_RECORD_KCOPY, grant, NULL, 0));
 }
 
 /**
