@@ -24,7 +24,7 @@ static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section);
  */
 static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
   //identical match
-  if(ec_match(ec_cert_records(c), section, 0, role, NULL, 0))
+  if(ec_record_match(ec_cert_records(c), section, 0, role, NULL, 0))
     return EC_OK;
 
   //wildcard match
@@ -33,13 +33,13 @@ static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
   char *pos = NULL;
   while(pos = strrchr(s, '.')) {
     strcpy(pos, ".*");
-    if(ec_match(ec_cert_records(c), section, 0, s, NULL, 0))
+    if(ec_record_match(ec_cert_records(c), section, 0, s, NULL, 0))
       return EC_OK;
     *pos = '\0';
   }
 
   //god-role match
-  if(ec_match(ec_cert_records(c), section, 0, "*", NULL, 0))
+  if(ec_record_match(ec_cert_records(c), section, 0, "*", NULL, 0))
     return EC_OK;
 
   return EC_ENOTFOUND;
@@ -49,14 +49,14 @@ static ec_err_t ec_role_has_section(ec_cert_t *c, char *role, char *section) {
  * Create a new role record
  */
 ec_record_t *ec_role_add(ec_cert_t *c, char *role) {
-  return ec_add(c, "$_role", ec_record(EC_RECORD_KCOPY, role, NULL, 0));
+  return ec_record_add(c, "$_role", ec_record(EC_RECORD_KCOPY, role, NULL, 0));
 }
 
 /**
  * Create a new grant record
  */
 ec_record_t *ec_role_grant(ec_cert_t *c, char *grant) {
-  return ec_add(c, "$_grant", ec_record(EC_RECORD_KCOPY, grant, NULL, 0));
+  return ec_record_add(c, "$_grant", ec_record(EC_RECORD_KCOPY, grant, NULL, 0));
 }
 
 /**

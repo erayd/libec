@@ -67,7 +67,7 @@ int main(void) {
   ec_abort(c_al == ec_ctx_cert(chain, ec_cert_id(c_al)), "Retrieve correct certificate via autoload");
 
   //validator
-  ec_abort(ec_add(c, "_test", ec_record(EC_RECORD_REQUIRE, "testRecord", NULL, 0)), "Add test record");
+  ec_abort(ec_record_add(c, "_test", ec_record(EC_RECORD_REQUIRE, "testRecord", NULL, 0)), "Add test record");
   ec_ctx_validator(ctx, validator);
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_REQUIRE), "Required record passes validation");
   validate = 1;

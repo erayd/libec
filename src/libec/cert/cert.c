@@ -294,7 +294,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     ec_cert_t *signer = ec_ctx_cert(ctx, c->signer_id);
 
     //iterate grants
-    for(ec_record_t *r = ec_match_bin(ec_cert_records(c), "_grant", 0, NULL, 0, NULL, 0);
+    for(ec_record_t *r = ec_record_match_bin(ec_cert_records(c), "_grant", 0, NULL, 0, NULL, 0);
       r && !(r->flags & EC_RECORD_SECTION); r = r->next)
     {
 
@@ -308,7 +308,7 @@ ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
     }
 
     //iterate roles
-    for(ec_record_t *r = ec_match_bin(ec_cert_records(c), "_role", 0, NULL, 0, NULL, 0);
+    for(ec_record_t *r = ec_record_match_bin(ec_cert_records(c), "_role", 0, NULL, 0, NULL, 0);
       r && !(r->flags & EC_RECORD_SECTION); r = r->next)
     {
 

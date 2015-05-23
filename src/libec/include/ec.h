@@ -187,7 +187,8 @@ ec_err_t ec_cert_unlock(ec_cert_t *c, char *password);
 
 
 //create a new record with binary key & data - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management
-ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data, uint16_t data_len);
+ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, unsigned char *data,
+  uint16_t data_len);
 
 //create a new record with string key & data
 ec_record_t *ec_record_str(uint16_t flags, char *key, char *data);
@@ -196,24 +197,24 @@ ec_record_t *ec_record_str(uint16_t flags, char *key, char *data);
 ec_record_t *ec_record(uint16_t flags, char *key, unsigned char *data, uint16_t data_len);
 
 //append a record to a certificate
-ec_record_t *ec_add(ec_cert_t *c, char *section, ec_record_t *r);
+ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r);
 
 //find the first matching record in a record list using binary key & data
-ec_record_t *ec_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key, uint8_t key_len,
-  unsigned char *data, uint16_t data_len);
+ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key,
+  uint8_t key_len, unsigned char *data, uint16_t data_len);
 
 //find the first matching record in a record list using string key & data
-ec_record_t *ec_match_str(ec_record_t *start, char *section, uint16_t flags, char *key, char *data);
+ec_record_t *ec_record_match_str(ec_record_t *start, char *section, uint16_t flags, char *key, char *data);
 
 //find the first matching record in a record list using string key & binary data
-ec_record_t *ec_match(ec_record_t *start, char *section, uint16_t flags, char *key, unsigned char *data,
-  uint16_t data_len);
+ec_record_t *ec_record_match(ec_record_t *start, char *section, uint16_t flags, char *key,
+  unsigned char *data, uint16_t data_len);
 
 //set a string record
-ec_record_t *ec_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data);
+ec_record_t *ec_record_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data);
 
 //get the string data for a record with matching key / flags.
-char *ec_get(ec_record_t *start, char *section, uint16_t flags, char *key);
+char *ec_record_get(ec_record_t *start, char *section, uint16_t flags, char *key);
 
 //get the section for a record
 char *ec_record_section(ec_record_t *r);
