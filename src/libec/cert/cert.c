@@ -173,6 +173,10 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
  * Check a certificate
  */
 ec_err_t ec_cert_check(ec_ctx_t *ctx, ec_cert_t *c, int flags) {
+  //certificate may not be NULL
+  if(!c)
+    return EC_EUNDEFINED;
+
   //always perform basic checks
   flags |= EC_CHECK_CERT;
 
