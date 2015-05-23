@@ -116,3 +116,13 @@ ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id) {
   return c;
 }
 
+/**
+ * Get the trust anchor for a certificate
+ */
+ec_cert_t *ec_ctx_anchor(ec_ctx_t *ctx, ec_cert_t *c) {
+  if(!c || ec_cert_check(ctx, c, EC_CHECK_CHAIN))
+    return NULL;
+  while(!(c->flags & EC_CERT_TRUSTED))
+    c = ec_ctx_cert(ctx, c->signer_id);
+  return c;
+}

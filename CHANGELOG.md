@@ -4,9 +4,11 @@
 
 ###New Interfaces
  * ec_ctx_remove()
+ * ec_ctx_anchor()
 
 ###Enhancements
  * Add interface to remove certificate from context store
+ * Add interface to get the trust anchor for a certificate
 
 ##[v0.2.0-dev](https://github.com/erayd/libec/releases/tag/v0.2.0-dev)
 

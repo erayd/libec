@@ -149,6 +149,9 @@ ec_cert_t *ec_ctx_remove(ec_ctx_t *ctx, ec_id_t id);
 //get certificate from context store
 ec_cert_t *ec_ctx_cert(ec_ctx_t *ctx, ec_id_t id);
 
+//get the trust anchor for a certificate
+ec_cert_t *ec_ctx_anchor(ec_ctx_t *ctx, ec_cert_t *c);
+
 
 
 //create a new certificate
@@ -180,6 +183,7 @@ ec_err_t ec_cert_lock(ec_cert_t *c, char *password);
 
 //decrypt a secret key
 ec_err_t ec_cert_unlock(ec_cert_t *c, char *password);
+
 
 
 //create a new record with binary key & data - use EC_RECORD_{KCOPY,KFREE,DCOPY,DFREE} for memory management

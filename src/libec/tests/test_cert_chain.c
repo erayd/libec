@@ -44,6 +44,9 @@ int main(void) {
   //check chain
   ec_abort(!ec_cert_check(ctx, c, EC_CHECK_CERT | EC_CHECK_SIGN | EC_CHECK_CHAIN), "Chain validates OK");
 
+  //CA is correct
+  ec_abort(ec_ctx_anchor(ctx, c) == ca, "CA is correct");
+
   //cleanup
   ec_ctx_destroy(ctx);
 
