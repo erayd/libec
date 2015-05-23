@@ -10,7 +10,7 @@
  * Add interface to remove certificate from context store
  * Add interface to get the trust anchor for a certificate
 
-##[v0.2.0-dev](https://github.com/erayd/libec/releases/tag/v0.2.0-dev)
+##[v0.2.1-dev](https://github.com/erayd/libec/releases/tag/v0.2.1-dev)
 
 ###New Interfaces
  * ec_cert_copy()
