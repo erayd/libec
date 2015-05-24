@@ -69,6 +69,12 @@ char *ec_errstr(ec_err_t error);
 #define EC_RECORD_DFREE (1 << 10) /*free record data when record is destroyed*/
 #define EC_RECORD_DCOPY (1 << 11) /*copy record data*/
 
+#define EC_MATCH_FLAGS (1 << 0) /*flags must match*/
+#define EC_MATCH_KEY (1 << 1) /*key must match*/
+#define EC_MATCH_KEY_LEN (1 << 2) /*key length must match*/
+#define EC_MATCH_DATA (1 << 3) /*data must match*/
+#define EC_MATCH_DATA_LEN (1 << 4) /*data length must match*/
+
 #define EC_CHECK_CERT (1 << 0) /*basic structure checks*/
 #define EC_CHECK_SIGN (1 << 1) /*certificate is signed*/
 #define EC_CHECK_SECRET (1 << 2) /*secret key is present*/
@@ -209,6 +215,9 @@ ec_record_t *ec_record_match_str(ec_record_t *start, char *section, uint16_t fla
 //find the first matching record in a record list using string key & binary data
 ec_record_t *ec_record_match(ec_record_t *start, char *section, uint16_t flags, char *key,
   unsigned char *data, uint16_t data_len);
+
+//get the next matching record in the same section
+ec_record_t *ec_record_next(ec_record_t *start, int filter);
 
 //set a string record
 ec_record_t *ec_record_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data);

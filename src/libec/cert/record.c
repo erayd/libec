@@ -190,6 +190,38 @@ ec_record_t *ec_record_match(ec_record_t *start, char *section, uint16_t flags, 
 }
 
 /**
+ * Get the next matching record in the same section
+ */
+ec_record_t *ec_record_next(ec_record_t *start, int filter) {
+  if(!start)
+    return NULL;
+  if(filter & EC_MATCH_KEY)
+    filter |= EC_MATCH_KEY_LEN;
+  if(filter & EC_MATCH_DATA)
+    filter |= EC_MATCH_DATA_LEN;
+
+  for(ec_record_t *r = start->next; r; r = r->next) {
+    if(r->flags & EC_RECORD_SECTION)
+      return NULL;
+
+    if(filter & EC_MATCH_FLAGS) {
+      if(((r->flags & start->flags) & 0xFF) != (start->flags & 0xFF))
+        continue;
+    }
+    if((filter & EC_MATCH_KEY_LEN) && r->key_len != start->key_len)
+      continue;
+    if((filter & EC_MATCH_DATA_LEN) && r->data_len != start->data_len)
+      continue;
+    if((filter & EC_MATCH_KEY) && memcmp(r->key, start->key, start->key_len))
+      continue;
+    if((filter & EC_MATCH_DATA) && memcmp(r->data, start->data, start->data_len))
+      continue;
+    return r;
+  }
+  return NULL;
+}
+
+/**
  * Set a string record
  */
 ec_record_t *ec_record_set(ec_cert_t *c, char *section, uint16_t flags, char *key, char *data) {

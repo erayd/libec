@@ -5,6 +5,7 @@
 ###New Interfaces
  * ec_ctx_remove()
  * ec_ctx_anchor()
+ * ec_record_next()
 
 ###Changed Interfaces
  * Rename ec_record() -> ec_record_create()
@@ -18,6 +19,7 @@
 ###Enhancements
  * Add interface to remove certificate from context store
  * Add interface to get the trust anchor for a certificate
+ * Add interface to get the next matching record in a section
 
 ##[v0.2.1-dev](https://github.com/erayd/libec/releases/tag/v0.2.1-dev)
 
