@@ -6,6 +6,15 @@
  * ec_ctx_remove()
  * ec_ctx_anchor()
 
+###Changed Interfaces
+ * Rename ec_record() -> ec_record_create()
+ * Rename ec_match() -> ec_record_match()
+ * Rename ec_match_bin() -> ec_record_match_bin()
+ * Rename ec_match_str() -> ec_record_match_str()
+ * Rename ec_add() -> ec_record_add()
+ * Rename ec_set() -> ec_record_set()
+ * Rename ec_get() -> ec_record_get()
+
 ###Enhancements
  * Add interface to remove certificate from context store
  * Add interface to get the trust anchor for a certificate
