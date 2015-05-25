@@ -19,6 +19,9 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <sodium.h>
 #include <string.h>
 
+static int _compfn(void *key, void *ptr);
+static int _talloc_destructor(void *ptr);
+
 
 /**
  * Skiplist compare
@@ -26,6 +29,14 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 static int _compfn(void *key, void *ptr) {
   ec_cert_t *c = ptr;
   return memcmp(key, c->pk, crypto_sign_PUBLICKEYBYTES);
+}
+
+/**
+ * Talloc destructor
+ */
+static int _talloc_destructor(void *ptr) {
+  ec_ctx_destroy(ptr);
+  return 0;
 }
 
 /**
@@ -38,11 +49,7 @@ ec_ctx_t *ec_ctx_create(void) {
   ctx->certs = ec_sl_create(_compfn);
 
   //clean up on talloc free
-  int talloc_destructor(void *ptr) {
-    ec_ctx_destroy(ptr);
-    return 0;
-  }
-  talloc_set_destructor(ctx, talloc_destructor);
+  talloc_set_destructor(ctx, _talloc_destructor);
 
   return ctx;
 }

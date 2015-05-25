@@ -17,6 +17,20 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <include/common.h>
 #include <string.h>
 
+
+/**
+ * Lookup char in the table
+ */
+static unsigned char _table(char c) {
+  const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+  char *d = (char*)table;
+  for(; *d; d++) {
+    if(c == *d)
+      return d - table;
+  }
+  return 0;
+}
+
 /**
  * Get the base64-encoded length for a buffer
  */
@@ -59,22 +73,13 @@ size_t ec_base64_encode(char *dest, unsigned char *src, size_t length) {
  * Decode base64 src into dest
  */
 size_t ec_base64_decode(unsigned char *dest, char *src, size_t length) {
-  unsigned char table(char c) {
-    const char *table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-    char *d = (char*)table;
-    for(; *d; d++) {
-      if(c == *d)
-        return d - table;
-    }
-    return 0;
-  }
   unsigned char *pos = dest;
   while(length >= 4) {
-    *pos++ = table(src[0]) << 2 | table(src[1]) >> 4;
+    *pos++ = _table(src[0]) << 2 | _table(src[1]) >> 4;
     if(src[2] != '=') {
-      *pos++ = table(src[1]) << 4 | table(src[2]) >> 2;
+      *pos++ = _table(src[1]) << 4 | _table(src[2]) >> 2;
       if(src[3] != '=')
-        *pos++ = table(src[2]) << 6 | table(src[3]);
+        *pos++ = _table(src[2]) << 6 | _table(src[3]);
     }
     src += 4;
     length -= 4;

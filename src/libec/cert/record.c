@@ -18,6 +18,16 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 #include <talloc.h>
 
+static int _talloc_destructor(void *ptr);
+
+/**
+ * Talloc destructor
+ */
+static int _talloc_destructor(void *ptr) {
+  ec_record_destroy(ptr);
+  return 0;
+}
+
 /**
  * Create a new record with binary key & data
  */
@@ -59,11 +69,7 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
   r->flags = flags;
 
   //clean up on talloc free
-  int talloc_destructor(void *ptr) {
-    ec_record_destroy(ptr);
-    return 0;
-  }
-  talloc_set_destructor(r, talloc_destructor);
+  talloc_set_destructor(r, _talloc_destructor);
 
   return r;
 }

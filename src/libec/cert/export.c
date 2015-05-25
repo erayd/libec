@@ -20,6 +20,8 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 
 #define EC_EXPORT_LINE 72
 
+static unsigned char *_bite(unsigned char **src, size_t *length, size_t bytes);
+
 /**
  * Get the required buffer length to export a record
  */
@@ -95,17 +97,21 @@ size_t ec_export(unsigned char *dest, ec_cert_t *c, uint8_t export_flags) {
 }
 
 /**
+ * Return current pointer, and seek buffer & length
+ */
+static unsigned char *_bite(unsigned char **src, size_t *length, size_t bytes) {
+  unsigned char *p = *src;
+  *length -= bytes;
+  *src += bytes;
+  return p;
+}
+
+/**
  * Import cert from buffer
  */
 ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
   if(consumed)
     *consumed = length;
-  unsigned char *bite(size_t bytes) {
-    unsigned char *p = src;
-    length -= bytes;
-    src += bytes;
-    return p;
-  }
   if(length < EC_EXPORT_MIN || (uint8_t)*src != EC_LAYOUT_VERSION)
     return NULL;
   ec_cert_t *c = talloc_zero(NULL, ec_cert_t);
@@ -113,9 +119,9 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
     return NULL;
 
   //layout version & cert exported length
-  c->version = *bite(sizeof(c->version));
+  c->version = *_bite(&src, &length, sizeof(c->version));
   uint16_t export_length = 0;
-  memcpy(&export_length, bite(sizeof(export_length)), sizeof(export_length));
+  memcpy(&export_length, _bite(&src, &length, sizeof(export_length)), sizeof(export_length));
   if(export_length > length + sizeof(c->version) + sizeof(export_length))  {
     free(c);
     return NULL;
@@ -124,37 +130,37 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
     length = export_length - sizeof(c->version) - sizeof(export_length);
 
   //flags & export flags
-  c->flags = *bite(sizeof(c->flags));
-  uint8_t export_flags = *bite(sizeof(export_flags));
+  c->flags = *_bite(&src, &length, sizeof(c->flags));
+  uint8_t export_flags = *_bite(&src, &length, sizeof(export_flags));
 
   //validity period
-  memcpy(&c->valid_from, bite(sizeof(c->valid_from)), sizeof(c->valid_from));
-  memcpy(&c->valid_until, bite(sizeof(c->valid_until)), sizeof(c->valid_until));
+  memcpy(&c->valid_from, _bite(&src, &length, sizeof(c->valid_from)), sizeof(c->valid_from));
+  memcpy(&c->valid_until, _bite(&src, &length, sizeof(c->valid_until)), sizeof(c->valid_until));
 
   //pk
   if(length < crypto_sign_PUBLICKEYBYTES ||
-    !(c->pk = talloc_memdup(c, bite(crypto_sign_PUBLICKEYBYTES), crypto_sign_PUBLICKEYBYTES)))
+    !(c->pk = talloc_memdup(c, _bite(&src, &length, crypto_sign_PUBLICKEYBYTES), crypto_sign_PUBLICKEYBYTES)))
     return NULL;
 
   //signer
   if(export_flags & EC_EXPORT_SIGNER) {
     if(length < EC_CERT_ID_BYTES ||
-      !(c->signer_id = talloc_memdup(c, bite(EC_CERT_ID_BYTES), EC_CERT_ID_BYTES)))
+      !(c->signer_id = talloc_memdup(c, _bite(&src, &length, EC_CERT_ID_BYTES), EC_CERT_ID_BYTES)))
       return NULL;
   }
 
   //signature
   if(export_flags & EC_EXPORT_SIGNATURE) {
     if(length < crypto_sign_BYTES ||
-      !(c->signature = talloc_memdup(c, bite(crypto_sign_BYTES), crypto_sign_BYTES)))
+      !(c->signature = talloc_memdup(c, _bite(&src, &length, crypto_sign_BYTES), crypto_sign_BYTES)))
       return NULL;
   }
 
   //sk
   if(export_flags & EC_EXPORT_SECRET) {
     if(length < crypto_sign_SECRETKEYBYTES + crypto_pwhash_scryptsalsa208sha256_SALTBYTES ||
-      !(c->sk = talloc_memdup(c, bite(crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES)) ||
-      !(c->salt = talloc_memdup(c, bite(crypto_pwhash_scryptsalsa208sha256_SALTBYTES),
+      !(c->sk = talloc_memdup(c, _bite(&src, &length, crypto_sign_SECRETKEYBYTES), crypto_sign_SECRETKEYBYTES)) ||
+      !(c->salt = talloc_memdup(c, _bite(&src, &length, crypto_pwhash_scryptsalsa208sha256_SALTBYTES),
         crypto_pwhash_scryptsalsa208sha256_SALTBYTES)))
       return NULL;
   }
@@ -162,7 +168,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
   //records
   for(ec_record_t **r = &c->records; length > EC_RECORD_MIN + sizeof(uint8_t); r = &(*r)->next) {
     uint16_t record_length = 0;
-    memcpy(&record_length, bite(sizeof(record_length)), sizeof(record_length));
+    memcpy(&record_length, _bite(&src, &length, sizeof(record_length)), sizeof(record_length));
     if(record_length >= length + sizeof(record_length))
       break;
 
@@ -170,11 +176,11 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
       ec_cert_destroy(c);
       ec_err_r(ENOMEM, NULL, NULL);
     }
-    (*r)->flags = *bite(sizeof(uint8_t));
-    (*r)->key_len = *bite(sizeof((*r)->key_len));
+    (*r)->flags = *_bite(&src, &length, sizeof(uint8_t));
+    (*r)->key_len = *_bite(&src, &length, sizeof((*r)->key_len));
     (*r)->data_len = record_length - EC_RECORD_MIN - (*r)->key_len;
-    (*r)->key = talloc_memdup(*r, bite((*r)->key_len), (*r)->key_len);
-    (*r)->data = talloc_memdup(*r, bite((*r)->data_len), (*r)->data_len);
+    (*r)->key = talloc_memdup(*r, _bite(&src, &length, (*r)->key_len), (*r)->key_len);
+    (*r)->data = talloc_memdup(*r, _bite(&src, &length, (*r)->data_len), (*r)->data_len);
     if(!(*r)->key || !(*r)->data) {
       ec_cert_destroy(c);
       ec_err_r(ENOMEM, NULL, NULL);
@@ -182,7 +188,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
   }
 
   //NULL terminator && no remaining data && cert passes basic checks
-  if(*bite(sizeof(uint8_t)) || length || ec_cert_check(NULL, c, EC_CHECK_CERT)) {
+  if(*_bite(&src, &length, sizeof(uint8_t)) || length || ec_cert_check(NULL, c, EC_CHECK_CERT)) {
     ec_cert_destroy(c);
     return NULL;
   }

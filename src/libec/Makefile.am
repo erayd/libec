@@ -16,9 +16,9 @@
 SUBDIRS = . tests
 
 if DEBUG
-AM_CFLAGS = -std=gnu99 -Wall -Werror -Wno-parentheses -ggdb
+AM_CFLAGS = -std=c99 -pedantic -Wall -Werror -Wno-parentheses -ggdb
 else !DEBUG
-AM_CFLAGS = -Wall -Wno-parentheses -std=gnu99 -g -O2
+AM_CFLAGS = -Wall -Wno-parentheses -std=c99 -pedantic -g -O2
 endif !DEBUG
 
 include_HEADERS = include/ec.h

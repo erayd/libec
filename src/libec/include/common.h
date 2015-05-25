@@ -60,12 +60,12 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #define ec_abort(condition, status, message) do {\
   if(!(condition)) {\
     fprintf(stderr, EC_CONSOLE_BOLD EC_CONSOLE_RED "EE [%s:%d]" EC_CONSOLE_RESET " %s\n", __FILE__, __LINE__,\
-      message ?: "");\
-    exit(status ?: EC_EUNKNOWN);\
+      message ? message : "");\
+    exit(status ? status : EC_EUNKNOWN);\
   }\
   if(DEBUG && DEBUG_PA) {\
     fprintf(stderr, EC_CONSOLE_GREEN "OK [%s:%d]" EC_CONSOLE_RESET " %s\n", __FILE__, __LINE__,\
-      message ?: "");\
+      message ? message : "");\
   }\
 } while(0)
 

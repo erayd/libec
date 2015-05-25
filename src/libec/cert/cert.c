@@ -20,6 +20,15 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <time.h>
 
 static ec_err_t ec_cert_cryptsk_toggle(ec_cert_t *c, char *password);
+static int _talloc_destructor(void *ptr);
+
+/**
+ * Talloc destructor
+ */
+static int _talloc_destructor(void *ptr) {
+  ec_cert_destroy(ptr);
+  return 0;
+}
 
 /**
  * Create a new certificate
@@ -38,16 +47,12 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
   randombytes_buf(c->salt, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
   sodium_mlock(c->sk, crypto_sign_SECRETKEYBYTES);
   crypto_sign_ed25519_keypair(c->pk, c->sk);
-  c->valid_from = valid_from ?: time(NULL);
-  c->valid_until = valid_until ?: ~0LL;
+  c->valid_from = valid_from ? valid_from : time(NULL);
+  c->valid_until = valid_until ? valid_until : ~0LL;
   c->version = EC_LAYOUT_VERSION;
 
   //clean up on talloc free
-  int talloc_destructor(void *ptr) {
-    ec_cert_destroy(ptr);
-    return 0;
-  }
-  talloc_set_destructor(c, talloc_destructor);
+  talloc_set_destructor(c, _talloc_destructor);
 
   return c;
 }
