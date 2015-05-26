@@ -207,6 +207,9 @@ ec_record_t *ec_record_create(uint16_t flags, char *key, unsigned char *data, ui
 //append a record to a certificate
 ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r);
 
+//remove a record from a certificate
+ec_record_t *ec_record_remove(ec_cert_t *c, ec_record_t *r);
+
 //find the first matching record in a record list using binary key & data
 ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key,
   uint8_t key_len, unsigned char *data, uint16_t data_len);

@@ -141,6 +141,21 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r) {
 }
 
 /**
+ * Remove a record from a certificate
+ */
+ec_record_t *ec_record_remove(ec_cert_t *c, ec_record_t *r) {
+  if(!r)
+    return NULL;
+  for(ec_record_t **p = &c->records; *p; p = &(*p)->next) {
+    if(*p == r) {
+      *p = (*p)->next;
+      break;
+    }
+  }
+  return r;
+}
+
+/**
  * Find the first matching record in a record list using binary key & data
  */
 ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key,
