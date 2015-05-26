@@ -78,6 +78,7 @@ int main(void) {
   ec_abort(!ec_ctx_cert(ctx, ec_cert_id(c)), "Certificate is no longer present in context store");
 
   //cleanup
+  ec_cert_destroy(c);
   ec_ctx_destroy(chain);
   ec_ctx_destroy(ctx);
 
