@@ -18,12 +18,12 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 #include <talloc.h>
 
-static int _talloc_destructor(void *ptr);
+static int _talloc_destructor(ec_record_t *ptr);
 
 /**
  * Talloc destructor
  */
-static int _talloc_destructor(void *ptr) {
+static int _talloc_destructor(ec_record_t *ptr) {
   ec_record_destroy(ptr);
   return 0;
 }

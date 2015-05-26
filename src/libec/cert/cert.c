@@ -20,12 +20,12 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <time.h>
 
 static ec_err_t ec_cert_cryptsk_toggle(ec_cert_t *c, char *password);
-static int _talloc_destructor(void *ptr);
+static int _talloc_destructor(ec_cert_t *ptr);
 
 /**
  * Talloc destructor
  */
-static int _talloc_destructor(void *ptr) {
+static int _talloc_destructor(ec_cert_t *ptr) {
   ec_cert_destroy(ptr);
   return 0;
 }

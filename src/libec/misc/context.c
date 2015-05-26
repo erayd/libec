@@ -20,7 +20,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <string.h>
 
 static int _compfn(void *key, void *ptr);
-static int _talloc_destructor(void *ptr);
+static int _talloc_destructor(ec_ctx_t *ptr);
 
 
 /**
@@ -34,7 +34,7 @@ static int _compfn(void *key, void *ptr) {
 /**
  * Talloc destructor
  */
-static int _talloc_destructor(void *ptr) {
+static int _talloc_destructor(ec_ctx_t *ptr) {
   ec_ctx_destroy(ptr);
   return 0;
 }
