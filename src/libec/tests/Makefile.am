@@ -13,7 +13,7 @@
 # DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
 # ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-AM_CFLAGS = -std=gnu99 -Wall -Werror -Wno-parentheses -ggdb
+AM_CFLAGS = -std=c99 -pedantic -Wall -Werror -Wno-parentheses -ggdb
 
 TESTS_TARGETS = cert \
 		ctx \
