@@ -45,13 +45,13 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
   //build record
   ec_record_t *r = talloc_zero(NULL, ec_record_t);
   if(!r)
-    ec_err_r(ENOMEM, NULL, NULL);
+    ec_err_r(ENOMEM, NULL);
   r->key_len = key_len;
   if(flags & EC_RECORD_KCOPY) {
     flags &= ~EC_RECORD_KFREE;
     if(!(r->key = talloc_memdup(r, key, key_len))) {
       talloc_free(r);
-      ec_err_r(ENOMEM, NULL, NULL);
+      ec_err_r(ENOMEM, NULL);
     }
   }
   else
@@ -61,7 +61,7 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
     flags &= ~EC_RECORD_DFREE;
     if(!(r->data = talloc_memdup(r, data, data_len))) {
       talloc_free(r);
-      ec_err_r(ENOMEM, NULL, NULL);
+      ec_err_r(ENOMEM, NULL);
     }
   }
   else
@@ -109,7 +109,7 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r) {
   //create section if missing
   if(!s) {
     if(!(s = ec_record_create(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
-      ec_err_r(ENOMEM, NULL, NULL);
+      ec_err_r(ENOMEM, NULL);
     talloc_reparent(talloc_parent(s), c, s);
     s->next = ec_cert_records(c);
     c->records = s;

@@ -36,7 +36,7 @@ static int _talloc_destructor(ec_cert_t *ptr) {
 ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
   ec_cert_t *c = talloc_zero(NULL, ec_cert_t);
   if(!c)
-    ec_err_r(ENOMEM, NULL, NULL);
+    ec_err_r(ENOMEM, NULL);
   c->pk = talloc_size(c, crypto_sign_PUBLICKEYBYTES);
   c->sk = talloc_size(c, crypto_sign_SECRETKEYBYTES);
   c->salt = talloc_size(c, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
@@ -156,7 +156,7 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
 
   //add signer data
   if(!(c->signer_id = talloc_memdup(c, ec_cert_id(signer), EC_CERT_ID_BYTES)))
-    ec_err_r(ENOMEM, EC_ENOMEM, NULL);
+    ec_err_r(ENOMEM, EC_ENOMEM);
 
   //generate hash
   unsigned char hash[EC_METHOD_BLAKE2B_512_BYTES];
@@ -164,7 +164,7 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
 
   //sign
   if(!(c->signature = talloc_size(c, crypto_sign_BYTES)))
-    ec_err_r(ENOMEM, EC_ENOMEM, NULL);
+    ec_err_r(ENOMEM, EC_ENOMEM);
   crypto_sign_detached(c->signature, NULL, hash, sizeof(hash), signer->sk);
 
   //check signature

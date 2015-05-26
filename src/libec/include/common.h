@@ -23,7 +23,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #include <stdlib.h>
 #include <limits.h>
 #include <errno.h>
-#include <error.h>
+#include <err.h>
 
 //not using debug mode
 #ifndef DEBUG
@@ -42,15 +42,17 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #define EC_CONSOLE_GREEN "\033[32m"
 
 //print error
-#define ec_err(error, ...) do {\
+#define ec_err(error) do {\
   if(error)\
     errno = error;\
-  error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__);\
+  err(1, "%s:%u", __FILE__, __LINE__);\
 } while(0)
 
 //print error and return
-#define ec_err_r(error, retval, ...) do {\
-  ec_err(error, __VA_ARGS__);\
+#define ec_err_r(error, retval) do {\
+  if(error)\
+    errno = error;\
+  warn("%s:%u", __FILE__, __LINE__);\
   return retval;\
 } while(0)
 

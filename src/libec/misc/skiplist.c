@@ -23,7 +23,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 ec_sl_t *ec_sl_create(ec_sl_compfn_t compfn) {
   ec_sl_t *l = talloc_zero(NULL, ec_sl_t);
   if(!l)
-    ec_err_r(ENOMEM, NULL, NULL);
+    ec_err_r(ENOMEM, NULL);
   l->compfn = compfn;
   return l;
 }
@@ -81,7 +81,7 @@ int ec_sl_insert(ec_sl_t *l, ec_sl_cursor_t *c, void *data) {
   //allocate new element
   ec_sl_node_t *n = talloc_array(l, ec_sl_node_t, level + 1);
   if(!n)
-    ec_err_r(ENOMEM, EC_ENOMEM, NULL);
+    ec_err_r(ENOMEM, EC_ENOMEM);
 
   //insert element
   n->data = data;

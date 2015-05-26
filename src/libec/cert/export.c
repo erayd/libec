@@ -174,7 +174,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
 
     if(!((*r) = talloc_zero(c, ec_record_t))) {
       ec_cert_destroy(c);
-      ec_err_r(ENOMEM, NULL, NULL);
+      ec_err_r(ENOMEM, NULL);
     }
     (*r)->flags = *_bite(&src, &length, sizeof(uint8_t));
     (*r)->key_len = *_bite(&src, &length, sizeof((*r)->key_len));
@@ -183,7 +183,7 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
     (*r)->data = talloc_memdup(*r, _bite(&src, &length, (*r)->data_len), (*r)->data_len);
     if(!(*r)->key || !(*r)->data) {
       ec_cert_destroy(c);
-      ec_err_r(ENOMEM, NULL, NULL);
+      ec_err_r(ENOMEM, NULL);
     }
   }
 

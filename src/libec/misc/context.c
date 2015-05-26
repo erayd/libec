@@ -45,7 +45,7 @@ static int _talloc_destructor(ec_ctx_t *ptr) {
 ec_ctx_t *ec_ctx_create(void) {
   ec_ctx_t *ctx = talloc_zero(NULL, ec_ctx_t);
   if(!ctx)
-    ec_err_r(ENOMEM, NULL, NULL);
+    ec_err_r(ENOMEM, NULL);
   ctx->certs = ec_sl_create(_compfn);
 
   //clean up on talloc free
