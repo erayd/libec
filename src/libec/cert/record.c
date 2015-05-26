@@ -97,7 +97,7 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r) {
     return NULL;
 
   //change talloc context
-  talloc_steal(c, r);
+  talloc_reparent(talloc_parent(r), c, r);
 
   //provided record is a section record
   if(r->flags & EC_RECORD_SECTION) {
@@ -110,7 +110,7 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r) {
   if(!s) {
     if(!(s = ec_record_create(EC_RECORD_SECTION|EC_RECORD_KCOPY, section, NULL, 0)))
       ec_err_r(ENOMEM, NULL, NULL);
-    talloc_steal(c, s);
+    talloc_reparent(talloc_parent(s), c, s);
     s->next = ec_cert_records(c);
     c->records = s;
   }

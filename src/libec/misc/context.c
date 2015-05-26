@@ -90,7 +90,7 @@ ec_ctx_t *ec_ctx_next(ec_ctx_t *ctx, ec_ctx_t *next) {
  */
 ec_cert_t *ec_ctx_save(ec_ctx_t *ctx, ec_cert_t *c) {
   if(c && !ec_sl_set(ctx->certs, ec_cert_id(c), c, (ec_sl_freefn_t)ec_cert_destroy)) {
-    talloc_steal(ctx, c);
+    talloc_reparent(talloc_parent(c), ctx, c);
     return c;
   }
   return NULL;
