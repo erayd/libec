@@ -1,5 +1,4 @@
 *~
-*.in
 *.la
 *.lo
 *.log
@@ -11,6 +10,8 @@
 .deps
 .dirstamp
 .libs
+Makefile.in
+config.h.in
 /aclocal.m4
 /autom4te.cache
 /compile
