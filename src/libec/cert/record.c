@@ -282,6 +282,8 @@ char *ec_record_section(ec_record_t *r) {
  * Free a record, plus associated data if KFREE / DFREE is set
  */
 void ec_record_destroy(ec_record_t *r) {
+  if(!r)
+    return;
   if(r->flags & EC_RECORD_KFREE)
     free(r->key);
   if(r->flags & EC_RECORD_DFREE)
