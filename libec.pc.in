@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Description: A small PKI library leveraging the crypto routines available in libsodium.
+
+Requires: libsodium >= 1.0.0, talloc >= 2.0.0
+Libs: -L${libdir} -lec
+Cflags: -I${includedir}
+

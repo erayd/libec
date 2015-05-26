@@ -16,3 +16,7 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 EXTRA_DIST = README.md LICENSE.md CHANGELOG.md
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = @PACKAGE_NAME@.pc
+DISTCLEANFILES = $(pkgconfig_DATA)

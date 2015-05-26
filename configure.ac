@@ -75,4 +75,9 @@ AC_CHECK_HEADER([talloc.h], [], [AC_MSG_ERROR([talloc.h is missing!])])
 # Checks for library functions.
 
 AM_CONFIG_HEADER([src/config.h])
-AC_OUTPUT(Makefile src/Makefile src/libec/Makefile src/libec/tests/Makefile)
+AC_OUTPUT([libec.pc
+           Makefile
+           src/Makefile
+           src/libec/Makefile
+           src/libec/tests/Makefile
+          ])

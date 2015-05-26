@@ -20,6 +20,7 @@
 /configure
 /depcomp
 /install-sh
+/libec.pc
 /libtool
 /ltmain.sh
 /m4
