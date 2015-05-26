@@ -54,12 +54,24 @@ ec_record_t *ec_record_bin(uint16_t flags, unsigned char *key, uint8_t key_len, 
       ec_err_r(ENOMEM, NULL);
     }
   }
+  else if(flags & EC_RECORD_KALLOC) {
+    if(!(r->key = talloc_zero_size(r, key_len))) {
+      talloc_free(r);
+      ec_err_r(ENOMEM, NULL);
+    }
+  }
   else
     r->key = key;
   r->data_len = data_len;
   if(flags & EC_RECORD_DCOPY) {
     flags &= ~EC_RECORD_DFREE;
     if(!(r->data = talloc_memdup(r, data, data_len))) {
+      talloc_free(r);
+      ec_err_r(ENOMEM, NULL);
+    }
+  }
+  else if (flags & EC_RECORD_DALLOC) {
+    if(!(r->data = talloc_zero_size(r, data_len))) {
       talloc_free(r);
       ec_err_r(ENOMEM, NULL);
     }
