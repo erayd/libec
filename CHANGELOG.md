@@ -2,6 +2,8 @@
 
 ##[Unreleased](https://github.com/erayd/libec/tree/dev)
 
+##[v0.2.2-dev](https://github.com/erayd/libec/releases/tag/v0.2.2-dev)
+
 ###New Interfaces
  * ec_ctx_remove()
  * ec_ctx_anchor()
