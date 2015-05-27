@@ -6,6 +6,9 @@
  * ec_ctx_remove()
  * ec_ctx_anchor()
  * ec_record_next()
+ * ec_record_remove()
+ * ec_record_remove_section()
+ * ec_record_data()
 
 ###Changed Interfaces
  * Rename ec_record() -> ec_record_create()
@@ -20,6 +23,17 @@
  * Add interface to remove certificate from context store
  * Add interface to get the trust anchor for a certificate
  * Add interface to get the next matching record in a section
+ * Add interfaces to remove records from a certificate
+ * Add interface to get a pointer to the data buffer for a record
+ * Refactor to properly comply with C99 (removes GNU extensions)
+ * Add pkg-config info
+ * Add flags to allocate an empty buffer when creating a record
+ * Allow searches to exclude NOSIGN records
+
+###Bugfixes
+ * Don't try to validate a NULL pointer when checking certificates
+ * Fix memory leak in context test suite
+ * Don't try to destroy NULL pointers in ec_record_destroy()
 
 ##[v0.2.1-dev](https://github.com/erayd/libec/releases/tag/v0.2.1-dev)
 
