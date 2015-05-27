@@ -33,6 +33,7 @@
  * Allow searches to exclude NOSIGN records
  * Add interface to quickly get or create a record buffer of minimum length
  * Add interface to bulk-set additional flags for an entire section
+ * Alter certificate layout to store crypto-related buffers as records
 
 ###Bugfixes
  * Don't try to validate a NULL pointer when checking certificates

@@ -37,9 +37,10 @@ ec_cert_t *ec_cert_create(time_t valid_from, time_t valid_until) {
   ec_cert_t *c = talloc_zero(NULL, ec_cert_t);
   if(!c)
     ec_err_r(ENOMEM, NULL);
-  c->pk = talloc_size(c, crypto_sign_PUBLICKEYBYTES);
-  c->sk = talloc_size(c, crypto_sign_SECRETKEYBYTES);
-  c->salt = talloc_size(c, crypto_pwhash_scryptsalsa208sha256_SALTBYTES);
+  c->pk = ec_record_buf(c, "_cert", "pk", crypto_sign_PUBLICKEYBYTES, 0);
+  c->sk = ec_record_buf(c, "_cert", "sk", crypto_sign_SECRETKEYBYTES, EC_RECORD_NOSIGN);
+  c->salt = ec_record_buf(c, "_cert", "salt", crypto_pwhash_scryptsalsa208sha256_SALTBYTES,
+    EC_RECORD_NOSIGN);
   if(!c->pk || !c->sk || !c->salt) {
     talloc_free(c);
     return NULL;
@@ -71,19 +72,26 @@ void ec_cert_destroy(ec_cert_t *c) {
  * Strip data from a certificate
  */
 void ec_cert_strip(ec_cert_t *c, int what) {
+  ec_record_t *sk = ec_record_match(ec_cert_records(c), "_cert", 0, "sk", NULL, 0);
+  ec_record_t *salt = ec_record_match(ec_cert_records(c), "_cert", 0, "salt", NULL, 0);
+  ec_record_t *signer_id = ec_record_match(ec_cert_records(c), "_cert", 0, "signer_id", NULL, 0);
+  ec_record_t *signature = ec_record_match(ec_cert_records(c), "_cert", 0, "signature", NULL, 0);
+
   //strip secret key
   if(what & EC_STRIP_SECRET) {
     sodium_munlock(c->sk, crypto_sign_SECRETKEYBYTES);
-    talloc_free(c->sk);
     c->sk = NULL;
+    c->salt = NULL;
+    ec_record_destroy(ec_record_remove(c, sk));
+    ec_record_destroy(ec_record_remove(c, salt));
   }
 
-  //strip NOSIGN records
+  //strip NOSIGN records other than secret & signature
   if(what & EC_STRIP_RECORD) {
     ec_record_t **ptr = &c->records;
     ec_record_t *r = *ptr;
     for(; r; r = *ptr) {
-      if(r->flags & EC_RECORD_NOSIGN) {
+      if((r->flags & EC_RECORD_NOSIGN) && r != sk && r != salt && r != signature) {
         *ptr = r->next;
         ec_record_destroy(r);
       }
@@ -94,10 +102,10 @@ void ec_cert_strip(ec_cert_t *c, int what) {
 
   //strip signer & signature
   if(what & EC_STRIP_SIGN) {
-    talloc_free(c->signer_id);
     c->signer_id = NULL;
-    talloc_free(c->signature);
     c->signature = NULL;
+    ec_record_destroy(ec_record_remove(c, signer_id));
+    ec_record_destroy(ec_record_remove(c, signature));
   }
 }
 
@@ -118,9 +126,6 @@ ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c) {
   crypto_generichash_update(&state, (unsigned char*)&sign_flags, sizeof(sign_flags));
   crypto_generichash_update(&state, (unsigned char*)&c->valid_from, sizeof(c->valid_from));
   crypto_generichash_update(&state, (unsigned char*)&c->valid_until, sizeof(c->valid_until));
-  //pk & signer pk
-  crypto_generichash_update(&state, c->pk, crypto_sign_PUBLICKEYBYTES);
-  crypto_generichash_update(&state, c->signer_id, crypto_sign_PUBLICKEYBYTES);
   //records
   for(ec_record_t *r = ec_cert_records(c); r; r = r->next) {
     //don't hash NOSIGN records
@@ -155,15 +160,16 @@ ec_err_t ec_cert_sign(ec_cert_t *c, ec_cert_t *signer) {
     c->valid_until = signer->valid_until;
 
   //add signer data
-  if(!(c->signer_id = talloc_memdup(c, ec_cert_id(signer), EC_CERT_ID_BYTES)))
+  if(!(c->signer_id = ec_record_buf(c, "_cert", "signer_id", EC_CERT_ID_BYTES, 0)))
     ec_err_r(ENOMEM, EC_ENOMEM);
+  memcpy(c->signer_id, ec_cert_id(signer), EC_CERT_ID_BYTES);
 
   //generate hash
   unsigned char hash[EC_METHOD_BLAKE2B_512_BYTES];
   rfail(ec_cert_hash(hash, c));
 
   //sign
-  if(!(c->signature = talloc_size(c, crypto_sign_BYTES)))
+  if(!(c->signature = ec_record_buf(c, "_cert", "signature", crypto_sign_BYTES, EC_RECORD_NOSIGN)))
     ec_err_r(ENOMEM, EC_ENOMEM);
   crypto_sign_detached(c->signature, NULL, hash, sizeof(hash), signer->sk);
 

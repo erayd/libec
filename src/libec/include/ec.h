@@ -91,17 +91,12 @@ char *ec_errstr(ec_err_t error);
 #define EC_STRIP_SIGN (1 << 2) /*strip signer_id & signature*/
 
 #define EC_EXPORT_SECRET (1 << 0) /*include secret key in exported cert*/
-#define EC_EXPORT_SIGNER (1 << 1) /*include signer_id in exported cert*/
-#define EC_EXPORT_SIGNATURE (1 << 2) /*include signature in exported cert*/
 
 //limits
-#define EC_EXPORT_HEADER (sizeof(uint8_t) * 3 /*version, flags & export flags*/ \
-  + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */ \
-  + 32 * 2 /*pk & signer id*/ + 64 * 2 /*sk & signature*/)
+#define EC_EXPORT_HEADER (sizeof(uint8_t) * 2 /*version & flags*/ \
+  + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */)
 #define EC_EXPORT_OVERHEAD (EC_EXPORT_HEADER + 1 /* NULL terminator*/)
-#define EC_EXPORT_MIN (sizeof(uint32_t) * 3 /*version, flags & export flags*/ \
-  + sizeof(uint16_t) /*cert length*/ + sizeof(uint32_t) * 2 /* validity period */ \
-  + 32 /*pk*/ + 1 /*NULL terminator*/)
+#define EC_EXPORT_MIN EC_EXPORT_OVERHEAD
 #define EC_EXPORT_MAX UINT16_MAX
 #define EC_RECORD_MAX (UINT16_MAX - EC_EXPORT_OVERHEAD) /*max length of packed record*/
 #define EC_RECORD_OVERHEAD (sizeof(uint16_t) /*record_len*/ + sizeof(uint8_t) /*key_len*/ + sizeof(uint8_t) /*flags*/)
@@ -303,7 +298,7 @@ ec_err_t ec_channel_decrypt(ec_channel_t *ch, unsigned char *buf, size_t len,
 //get the remote cert
 ec_cert_t *ec_channel_remote(ec_channel_t *ch);
 
-/* +++++++++++++++ EXPORTED DATA LAYOUT V2 +++++++++++++++
+/* +++++++++++++++ EXPORTED DATA LAYOUT V3 +++++++++++++++
    
    Exported trust chain certificates are appended in order of ascending
    authority (e.g. cert, signer, signer's signer etc.)
@@ -312,14 +307,8 @@ ec_cert_t *ec_channel_remote(ec_channel_t *ch);
     1B  (required) layout version
     2B  (required) certificate length
     1B  (required) certificate flags
-    1B  (required) export flags
     4B  (required) valid_from
     4B  (required) valid_until
-    32B (required) ed25519 public key
-    32B (optional) ed25519 signer id
-    64B (optional) ed25519 signature (signed blake2b 512bit hash)
-    64B (optional) ed25519 secret key
-    32B (optional) salt for password-encryption of secret key
     <records>
     1B (required) NULL byte
 

@@ -84,7 +84,7 @@ ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFT
 #define EC_METHOD_BLAKE2B_512_BYTES 64
 
 //layout version
-#define EC_LAYOUT_VERSION 2
+#define EC_LAYOUT_VERSION 3
 
 //certificates
 ec_err_t ec_cert_hash(unsigned char *hash, ec_cert_t *c);
