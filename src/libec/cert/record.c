@@ -148,6 +148,7 @@ ec_record_t *ec_record_remove(ec_cert_t *c, ec_record_t *r) {
     return NULL;
   for(ec_record_t **p = &c->records; *p; p = &(*p)->next) {
     if(*p == r) {
+      talloc_reparent(talloc_parent(*p), NULL, *p);
       *p = (*p)->next;
       break;
     }
@@ -166,6 +167,7 @@ void ec_record_remove_section(ec_cert_t *c, char *section, ec_freefn_t freefn) {
       if(r->flags & EC_RECORD_SECTION)
         break;
       s->next = next = r->next;
+      talloc_reparent(talloc_parent(r), NULL, r);
       if(freefn)
         freefn(r);
     }
