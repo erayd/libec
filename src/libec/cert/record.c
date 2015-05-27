@@ -165,7 +165,7 @@ void ec_record_remove_section(ec_cert_t *c, char *section, ec_freefn_t freefn) {
     for(ec_record_t *r = next; r; r = next) {
       if(r->flags & EC_RECORD_SECTION)
         break;
-      next = r->next;
+      s->next = next = r->next;
       if(freefn)
         freefn(r);
     }
