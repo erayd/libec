@@ -322,3 +322,19 @@ void ec_record_destroy(ec_record_t *r) {
     free(r->data);
   talloc_free(r);
 }
+
+/**
+ * Get or create a data buffer at least $length bytes long in a record
+ */
+unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length) {
+  ec_record_t *r = ec_record_match(ec_cert_records(c), section, 0, key, NULL, 0);
+  //record exists
+  if(r) {
+    if(!r->data || (length && r->data_len < length))
+      return NULL;
+    return r->data;
+  }
+  //create record
+  r = ec_record_add(c, section, ec_record_create(EC_RECORD_KCOPY | EC_RECORD_DALLOC, key, NULL, length));
+  return r ? r->data : NULL;
+}

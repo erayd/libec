@@ -244,6 +244,8 @@ unsigned char *ec_record_data(ec_record_t *r);
 //free a record, plus associated data if KFREE / DFREE is set
 void ec_record_destroy(ec_record_t *r);
 
+//get or create a buffer in a record
+unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length);
 
 
 //add a role to a certificate

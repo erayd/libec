@@ -9,6 +9,7 @@
  * ec_record_remove()
  * ec_record_remove_section()
  * ec_record_data()
+ * ec_record_buf()
 
 ###Changed Interfaces
  * Rename ec_record() -> ec_record_create()
@@ -29,6 +30,7 @@
  * Add pkg-config info
  * Add flags to allocate an empty buffer when creating a record
  * Allow searches to exclude NOSIGN records
+ * Add interface to quickly get or create a record buffer of minimum length
 
 ###Bugfixes
  * Don't try to validate a NULL pointer when checking certificates
