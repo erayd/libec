@@ -70,6 +70,7 @@ char *ec_errstr(ec_err_t error);
 #define EC_RECORD_DCOPY (1 << 11) /*copy record data*/
 #define EC_RECORD_KALLOC (1 << 12) /*allocate empty buffer for key*/
 #define EC_RECORD_DALLOC (1 << 13) /*allocate empty buffer for data*/
+#define EC_RECORD_SIGNED (1 << 14) /*(match only) NOSIGN must not be set*/
 
 #define EC_MATCH_FLAGS (1 << 0) /*flags must match*/
 #define EC_MATCH_KEY (1 << 1) /*key must match*/

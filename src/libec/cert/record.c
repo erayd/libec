@@ -204,8 +204,12 @@ ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t fla
     if((r->flags & EC_RECORD_SECTION) && !(flags & EC_RECORD_SECTION))
       break;
     //flags
-    if(flags && (r->flags & flags) != flags)
-      continue;
+    if(flags) {
+      if((r->flags & flags) != flags)
+        continue;
+      if((flags & EC_RECORD_SIGNED) && (r->flags & EC_RECORD_NOSIGN))
+        continue;
+    }
     //key
     if(key_len) {
       if(r->key_len != key_len)
