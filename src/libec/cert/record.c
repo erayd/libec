@@ -156,6 +156,25 @@ ec_record_t *ec_record_remove(ec_cert_t *c, ec_record_t *r) {
 }
 
 /**
+ * Remove an entire section from a certificate
+ */
+void ec_record_remove_section(ec_cert_t *c, char *section, ec_freefn_t freefn) {
+  ec_record_t *s = ec_record_match(ec_cert_records(c), NULL, EC_RECORD_SECTION, section, NULL, 0);
+  if(s) {
+    ec_record_t *next = s->next;
+    for(ec_record_t *r = next; r; r = next) {
+      if(r->flags & EC_RECORD_SECTION)
+        break;
+      next = r->next;
+      if(freefn)
+        freefn(r);
+    }
+    s->next = next;
+    ec_record_destroy(ec_record_remove(c, s));
+  }
+}
+
+/**
  * Find the first matching record in a record list using binary key & data
  */
 ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key,

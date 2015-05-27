@@ -122,6 +122,7 @@ typedef struct ec_channel_t ec_channel_t;
 typedef unsigned char *ec_id_t;
 typedef ec_cert_t *(*ec_autoload_t)(ec_id_t id);
 typedef int (*ec_record_validator_t)(ec_ctx_t *ctx, ec_cert_t *c, ec_record_t *r);
+typedef void (*ec_freefn_t)(void *ptr);
 
 
 
@@ -209,6 +210,9 @@ ec_record_t *ec_record_add(ec_cert_t *c, char *section, ec_record_t *r);
 
 //remove a record from a certificate
 ec_record_t *ec_record_remove(ec_cert_t *c, ec_record_t *r);
+
+//remove an entire section from a certificate
+void ec_record_remove_section(ec_cert_t *c, char *section, ec_freefn_t freefn);
 
 //find the first matching record in a record list using binary key & data
 ec_record_t *ec_record_match_bin(ec_record_t *start, char *section, uint16_t flags, unsigned char *key,
