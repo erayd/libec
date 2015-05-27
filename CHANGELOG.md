@@ -10,6 +10,7 @@
  * ec_record_remove_section()
  * ec_record_data()
  * ec_record_buf()
+ * ec_record_section_flags()
 
 ###Changed Interfaces
  * Rename ec_record() -> ec_record_create()
@@ -31,6 +32,7 @@
  * Add flags to allocate an empty buffer when creating a record
  * Allow searches to exclude NOSIGN records
  * Add interface to quickly get or create a record buffer of minimum length
+ * Add interface to bulk-set additional flags for an entire section
 
 ###Bugfixes
  * Don't try to validate a NULL pointer when checking certificates

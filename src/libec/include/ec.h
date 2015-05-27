@@ -247,6 +247,8 @@ void ec_record_destroy(ec_record_t *r);
 //get or create a buffer in a record
 unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length);
 
+//bulk-set additional record flags for an entire section
+void ec_record_section_flags(ec_cert_t *c, char *section, uint16_t flags);
 
 //add a role to a certificate
 ec_record_t *ec_role_add(ec_cert_t *c, char *role);

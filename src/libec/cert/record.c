@@ -338,3 +338,16 @@ unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t leng
   r = ec_record_add(c, section, ec_record_create(EC_RECORD_KCOPY | EC_RECORD_DALLOC, key, NULL, length));
   return r ? r->data : NULL;
 }
+
+/**
+ * Bulk-set additional flags for an entire section
+ */
+void ec_record_section_flags(ec_cert_t *c, char *section, uint16_t flags) {
+  ec_record_t *s = ec_record_match(ec_cert_records(c), NULL, EC_RECORD_SECTION, section, NULL, 0);
+  if(s) {
+    flags &= 0xFF;
+    s->flags |= flags;
+    for(ec_record_t *r = s->next; r && !(r->flags & EC_RECORD_SECTION); r = r->next)
+      r->flags |= flags;
+  }
+}
