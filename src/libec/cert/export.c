@@ -143,6 +143,8 @@ ec_cert_t *ec_import(unsigned char *src, size_t length, size_t *consumed) {
   //field buffers
   c->pk = ec_record_buf(c, "_cert", "pk", crypto_sign_PUBLICKEYBYTES, EC_RECORD_SIGNED);
   c->sk = ec_record_buf(c, "_cert", "sk", crypto_sign_SECRETKEYBYTES, 0);
+  if(c->sk)
+    sodium_mlock(c->sk, crypto_sign_SECRETKEYBYTES);
   c->salt = ec_record_buf(c, "_cert", "salt", crypto_pwhash_scryptsalsa208sha256_SALTBYTES, 0);
   c->signer_id = ec_record_buf(c, "_cert", "signer_id", EC_CERT_ID_BYTES, EC_RECORD_SIGNED);
   c->signature = ec_record_buf(c, "_cert", "signature", crypto_sign_BYTES, 0);
