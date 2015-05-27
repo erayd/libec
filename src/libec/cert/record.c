@@ -332,6 +332,8 @@ unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t leng
   if(r) {
     if((r->flags & (flags & 0xFF)) != (flags & 0xFF))
       return NULL;
+    if((r->flags & EC_RECORD_NOSIGN) && (flags & EC_RECORD_SIGNED))
+      return NULL;
     if(!r->data || (length && r->data_len < length))
       return NULL;
     return r->data;
