@@ -326,7 +326,7 @@ void ec_record_destroy(ec_record_t *r) {
 /**
  * Get or create a data buffer at least $length bytes long in a record
  */
-unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length) {
+unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length, uint16_t flags) {
   ec_record_t *r = ec_record_match(ec_cert_records(c), section, 0, key, NULL, 0);
   //record exists
   if(r) {
@@ -336,7 +336,10 @@ unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t leng
   }
   //create record
   r = ec_record_add(c, section, ec_record_create(EC_RECORD_KCOPY | EC_RECORD_DALLOC, key, NULL, length));
-  return r ? r->data : NULL;
+  if(!r)
+    return NULL;
+  r->flags |= (flags & 0xFF);
+  return r->data;
 }
 
 /**

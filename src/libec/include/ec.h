@@ -245,7 +245,7 @@ unsigned char *ec_record_data(ec_record_t *r);
 void ec_record_destroy(ec_record_t *r);
 
 //get or create a buffer in a record
-unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length);
+unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t length, uint16_t flags);
 
 //bulk-set additional record flags for an entire section
 void ec_record_section_flags(ec_cert_t *c, char *section, uint16_t flags);
