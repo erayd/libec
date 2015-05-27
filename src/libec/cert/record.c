@@ -302,6 +302,13 @@ char *ec_record_section(ec_record_t *r) {
 }
 
 /**
+ * Get the data buffer for a record
+ */
+unsigned char *ec_record_data(ec_record_t *r) {
+  return r ? r->data : NULL;
+}
+
+/**
  * Free a record, plus associated data if KFREE / DFREE is set
  */
 void ec_record_destroy(ec_record_t *r) {

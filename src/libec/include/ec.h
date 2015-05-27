@@ -238,6 +238,9 @@ char *ec_record_get(ec_record_t *start, char *section, uint16_t flags, char *key
 //get the section for a record
 char *ec_record_section(ec_record_t *r);
 
+//get the data buffer for a record
+unsigned char *ec_record_data(ec_record_t *r);
+
 //free a record, plus associated data if KFREE / DFREE is set
 void ec_record_destroy(ec_record_t *r);
 
