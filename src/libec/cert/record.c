@@ -330,6 +330,8 @@ unsigned char *ec_record_buf(ec_cert_t *c, char *section, char *key, size_t leng
   ec_record_t *r = ec_record_match(ec_cert_records(c), section, 0, key, NULL, 0);
   //record exists
   if(r) {
+    if((r->flags & (flags & 0xFF)) != (r->flags & 0xFF))
+      return NULL;
     if(!r->data || (length && r->data_len < length))
       return NULL;
     return r->data;
