@@ -14,7 +14,7 @@ DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
 ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <include/common.h>
+#include <common.h>
 #include <talloc.h>
 #include <sodium.h>
 #include <string.h>
